@@ -1,0 +1,29 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+env:
+  AWS_REGION: eu-west-2
+  AWS_ACCOUNT_ID: 163841473800
+
+jobs:
+  build:
+    name: CDP-build-workflow
+    runs-on: ubuntu-latest
+    if: github.actor != 'cdp-gh-bot[bot]'
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Build and Publish
+        uses: defra-cdp-sandpit/cdp-build-action/build@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
