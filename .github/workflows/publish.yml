@@ -23,7 +23,9 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Build and Publish
-        uses: defra-cdp-sandpit/cdp-build-action/build@main
+      - name: Test
+        uses: actions/setup-dotnet@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          dotnet-version: |
+            6.0.412
+      - run: dotnet test
