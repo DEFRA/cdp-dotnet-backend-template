@@ -30,7 +30,6 @@ public class MongoDbClientFactory : IMongoDbClientFactory
 
     public IMongoCollection<T> GetCollection<T>(string collection)
     {
-        var client = CreateClient();
         return _mongoDatabase.GetCollection<T>(collection);
     }
 }

@@ -9,29 +9,18 @@ namespace Backend.Api.Test;
 
 public sealed class BackendApiFactory : WebApplicationFactory<IApiMarker>
 {
-    // private readonly MongoRunnerOptions _options = new()
-    // {
-    //     UseSingleNodeReplicaSet = true, // Default: false
-    //     StandardOuputLogger = line => Console.WriteLine(line), // Default: null
-    //     StandardErrorLogger = line => Console.WriteLine(line), // Default: null
-    //     AdditionalArguments = "--quiet", // Default: null
-    //     MongoPort = 27777, // Default: random available port
-    //     KillMongoProcessesWhenCurrentProcessExits = true // Default: false
-    // };
-    //
-    // private IMongoRunner _runner = null!;
+    private readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder().WithImage("mongo:6.0")
+        .WithPortBinding(27017, true).Build();
 
-    private readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder().WithPortBinding(27017, true).Build();
-    
-    protected override async void ConfigureWebHost(IWebHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        await _mongoDbContainer.StartAsync();
+        _mongoDbContainer.StartAsync().Wait();
 
         builder.ConfigureServices(collection =>
         {
             collection.RemoveAll(typeof(IMongoDbClientFactory));
             collection.AddSingleton<IMongoDbClientFactory>(_ =>
-                new MongoDbClientFactory($"mongodb://127.0.0.1:{_mongoDbContainer.GetMappedPublicPort(27017)}", "books"));
+                new MongoDbClientFactory(_mongoDbContainer.GetConnectionString(), "books"));
         });
     }
 

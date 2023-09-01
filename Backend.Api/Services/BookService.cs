@@ -5,14 +5,11 @@ using MongoDB.Driver;
 
 namespace Backend.Api.Services;
 
-public class BookService : IBookService
+public class BookService : MongoService<MongoBook>, IBookService
 {
-    private readonly IMongoCollection<MongoBook> _booksCollection;
 
-    public BookService(IMongoDbClientFactory connectionFactory)
+    public BookService(IMongoDbClientFactory connectionFactory, ILoggerFactory loggerFactory) : base(connectionFactory, "books", loggerFactory)
     {
-        _booksCollection = connectionFactory.GetCollection<MongoBook>("books");
-        Task.Run(() => EnsureIndexes()).Wait(); // Figure out a better way of doing this 
     }
 
     public async Task<bool> CreateAsync(Book book)
@@ -20,19 +17,19 @@ public class BookService : IBookService
         var existingBook = await GetByIsbnAsync(book.Isbn);
         if (existingBook is not null) return false;
 
-        await _booksCollection.InsertOneAsync(new MongoBook(book));
+        await Collection.InsertOneAsync(new MongoBook(book));
         return true;
     }
 
     public async Task<Book?> GetByIsbnAsync(string isbn)
     {
-        var result = await _booksCollection.Find(b => b.Isbn == isbn).ToListAsync();
+        var result = await Collection.Find(b => b.Isbn == isbn).ToListAsync();
         return result?.FirstOrDefault()?.ToBook();
     }
 
     public async Task<IEnumerable<Book>> GetAllAsync()
     {
-        var result = await _booksCollection.Find(_ => true).ToListAsync();
+        var result = await Collection.Find(_ => true).ToListAsync();
         return result.Select(mongoBook => mongoBook.ToBook());
     }
 
@@ -40,29 +37,27 @@ public class BookService : IBookService
     {
         var searchOptions = new TextSearchOptions { CaseSensitive = false, DiacriticSensitive = false };
         var filter = Builders<MongoBook>.Filter.Text(searchTerm, searchOptions);
-        var result = await _booksCollection.Find(filter).ToListAsync();
+        var result = await Collection.Find(filter).ToListAsync();
         return result.Select(mongoBook => mongoBook.ToBook());
     }
 
     public async Task<bool> UpdateAsync(Book book)
     {
-        var result = await _booksCollection.ReplaceOneAsync(b => b.Isbn == book.Isbn, new MongoBook(book));
+        var result = await Collection.ReplaceOneAsync(b => b.Isbn == book.Isbn, new MongoBook(book));
         return result.ModifiedCount > 0;
     }
 
     public async Task<bool> DeleteAsync(string isbn)
     {
-        var result = await _booksCollection.DeleteOneAsync(b => b.Isbn == isbn);
+        var result = await Collection.DeleteOneAsync(b => b.Isbn == isbn);
         return result.DeletedCount > 0;
     }
 
-    private IEnumerable<string?> EnsureIndexes()
+    protected override List<CreateIndexModel<MongoBook>> DefineIndexes(IndexKeysDefinitionBuilder<MongoBook> builder)
     {
         var options = new CreateIndexOptions { Unique = true };
-        var bookBuilder = Builders<MongoBook>.IndexKeys;
-        var indexModel = new CreateIndexModel<MongoBook>(bookBuilder.Ascending(b => b.Isbn), options);
-        var titleModel = new CreateIndexModel<MongoBook>(bookBuilder.Text(b => b.Title));
-        var result = _booksCollection.Indexes.CreateMany(new[] { indexModel, titleModel });
-        return result;
+        var indexModel = new CreateIndexModel<MongoBook>(builder.Ascending(b => b.Isbn), options);
+        var titleModel = new CreateIndexModel<MongoBook>(builder.Text(b => b.Title));
+        return new List<CreateIndexModel<MongoBook>>() { indexModel, titleModel };
     }
 }
