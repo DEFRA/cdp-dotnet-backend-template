@@ -20,6 +20,8 @@ var logger = new LoggerConfiguration()
     .CreateLogger();
 builder.Logging.AddSerilog(logger);
 
+logger.Information("Starting application");
+
 // Mongo
 builder.Services.AddSingleton<IMongoDbClientFactory>(_ =>
     new MongoDbClientFactory(builder.Configuration.GetValue<string>("Mongo:DatabaseUri")!,
