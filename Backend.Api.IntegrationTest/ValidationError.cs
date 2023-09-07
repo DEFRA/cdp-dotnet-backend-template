@@ -1,4 +1,4 @@
-﻿namespace Backend.Api.Test;
+﻿namespace Backend.Api.IntegrationTest;
 
 public class ValidationError
 {

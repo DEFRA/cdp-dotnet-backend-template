@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.MongoDb;
 
-namespace Backend.Api.Test;
+namespace Backend.Api.IntegrationTest;
 
 public sealed class BackendApiFactory : WebApplicationFactory<IApiMarker>
 {

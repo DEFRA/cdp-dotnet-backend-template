@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using Backend.Api.Models;
 using FluentAssertions;
 
-namespace Backend.Api.Test;
+namespace Backend.Api.IntegrationTest;
 
 public class BackendEndpointsTests
     : IClassFixture<BackendApiFactory>, IAsyncLifetime
@@ -204,7 +204,7 @@ public class BackendEndpointsTests
         {
             Isbn = GenerateIsbn(),
             Title = title,
-            Author = "Nick Chapsas",
+            Author = "Mo Mo",
             PageCount = 420,
             ShortDescription = "All my tricks in one book",
             ReleaseDate = new DateTime(2023, 1, 1)

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Api", "Backend.Api\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Api.Test", "Backend.Api.Test\Backend.Api.Test.csproj", "{5CB86A4A-162D-4A20-9403-5BB89D671BF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Api.IntegrationTest", "Backend.Api.IntegrationTest\Backend.Api.IntegrationTest.csproj", "{9CBD964A-2EA8-48ED-9593-9715C6D685AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{5CB86A4A-162D-4A20-9403-5BB89D671BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CB86A4A-162D-4A20-9403-5BB89D671BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CB86A4A-162D-4A20-9403-5BB89D671BF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CBD964A-2EA8-48ED-9593-9715C6D685AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CBD964A-2EA8-48ED-9593-9715C6D685AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CBD964A-2EA8-48ED-9593-9715C6D685AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CBD964A-2EA8-48ED-9593-9715C6D685AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
