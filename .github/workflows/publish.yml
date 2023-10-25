@@ -12,20 +12,17 @@ permissions:
 
 env:
   AWS_REGION: eu-west-2
-  AWS_ACCOUNT_ID: 163841473800
+  AWS_ACCOUNT_ID: "094954420758"
 
 jobs:
   build:
     name: CDP-build-workflow
     runs-on: ubuntu-latest
-    if: github.actor != 'cdp-gh-bot[bot]'
-
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Test
-        uses: actions/setup-dotnet@v3
+
+      - name: Build and Publish
+        uses: DEFRA/cdp-build-action/build@main
         with:
-          dotnet-version: |
-            6.0.412
-      - run: dotnet test
+          github-token: ${{ secrets.GITHUB_TOKEN }}
