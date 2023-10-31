@@ -34,11 +34,11 @@ jobs:
           mv CdpDotnetBackendTemplate.sln ${{ env.REPO_NAME_PASCAL_CASE }}.sln    
       - name: Update README.md
         run: |
-          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/CDP C# ASP.NET Backend Template/${{ github.repository }}/g' {} \;       
+          sed -i 's/CDP C# ASP.NET Backend Template/${{ github.repository }}/g' README.md
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions@github.com'
-          git add .
+          git add -A
           git commit -m "Applying template changes"
           git push origin main
