@@ -32,7 +32,10 @@ jobs:
           find . -name .git -prune -o -name .github -prune -o -depth -name '*Backend\.Api*' -execdir bash -c 'mv -i "$1" "${1//Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
       - name: Rename the Solution
         run: |
-          mv CdpDotnetBackendTemplate.sln ${{ env.REPO_NAME_PASCAL_CASE }}.sln    
+          mv CdpDotnetBackendTemplate.sln ${{ env.REPO_NAME_PASCAL_CASE }}.sln  
+      - name: Remove template
+        run: |
+          rm .github/workflows/temple.yml      
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
