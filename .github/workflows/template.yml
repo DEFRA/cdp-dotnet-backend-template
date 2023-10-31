@@ -35,7 +35,7 @@ jobs:
           mv CdpDotnetBackendTemplate.sln ${{ env.REPO_NAME_PASCAL_CASE }}.sln  
       - name: Remove template
         run: |
-          rm .github/workflows/temple.yml      
+          rm .github/workflows/template.yml      
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
