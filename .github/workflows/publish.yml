@@ -15,6 +15,35 @@ env:
   AWS_ACCOUNT_ID: "094954420758"
 
 jobs:
+  templating:
+    if: github.run_number == 1
+    name: CDP-templating-workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set RepoNamePascalCase
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $2}')
+          REPO_NAME_PASCAL_CASE=$(echo $REPO_NAME | sed -r 's/(^|-)([a-z])/\U\2/g')
+          echo "REPO_NAME_PASCAL_CASE=$REPO_NAME_PASCAL_CASE" >> $GITHUB_ENV  
+      - name: Replace Backend.Api with RepoNamePascalCase in files
+        run: |
+          find . -type f -exec sed -i 's/Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}/g' {} \;
+      - name: Replace Backend.Api with RepoNamePascalCase in file and directory names
+        run: |
+          find . -depth -name '*Backend.Api*' -execdir bash -c 'mv -i "$1" "${1//Backend.Api/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
+      - name: Update README.md
+        run: |
+          find . -depth -name 'CDP C# ASP.NET Backend Template' -execdir bash -c 'mv -i "$1" "${1//CDP C# ASP.NET Backend Template/${{ github.repository }}}"' bash {} \;        
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+          git add .
+          git commit -m "Applying template changes"
+          git push origin main      
+      
   build:
     if: github.run_number != 1
     name: CDP-build-workflow
@@ -22,7 +51,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-
       - name: Build and Publish
         uses: DEFRA/cdp-build-action/build@main
         with:
