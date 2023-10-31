@@ -26,7 +26,7 @@ jobs:
       - name: Replace Backend.Api with RepoNamePascalCase in files
         run: |
           find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}/g' {} \;
-      - name: Replace ${{ REPO_NAME_PASCAL_CASE }} with RepoNamePascalCase in file and directory names
+      - name: Replace Backend.Api with RepoNamePascalCase in file and directory names
         run: |
           find . -name .git -prune -o -name .github -prune -o -depth -name '*${{ REPO_NAME_PASCAL_CASE }}*' -execdir bash -c 'mv -i "$1" "${1//${{ REPO_NAME_PASCAL_CASE }}/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
       - name: Update README.md
