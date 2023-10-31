@@ -29,9 +29,12 @@ jobs:
       - name: Replace Backend.Api with RepoNamePascalCase in file and directory names
         run: |
           find . -name .git -prune -o -name .github -prune -o -depth -name '*Backend\.Api*' -execdir bash -c 'mv -i "$1" "${1//Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
+      - name: Rename the Solution
+        run: |
+          mv CdpDotnetBackendTemplate.sln ${{ env.REPO_NAME_PASCAL_CASE }}.sln    
       - name: Update README.md
         run: |
-          find . -name .git -prune -o -name .github -prune -o -depth -name 'CDP C# ASP.NET Backend Template' -execdir bash -c 'mv -i "$1" "${1//CDP C# ASP.NET Backend Template/${{ github.repository }}}"' bash {} \;        
+          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/CDP C# ASP.NET Backend Template/${{ github.repository }}/g' {} \;       
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
