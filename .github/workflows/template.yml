@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   templating:
-    if: github.run_number == 1
+    if: github.run_number == 1 && github.repository != 'cdp-dotnet-backend-template'
     name: CDP-templating-workflow
     runs-on: ubuntu-latest
     steps:
@@ -25,18 +25,17 @@ jobs:
           echo "REPO_NAME_PASCAL_CASE=$REPO_NAME_PASCAL_CASE" >> $GITHUB_ENV  
       - name: Replace Backend.Api with RepoNamePascalCase in files
         run: |
-          find . -type f -exec sed -i 's/Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}/g' {} \;
-      - name: Replace Backend.Api with RepoNamePascalCase in file and directory names
+          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}/g' {} \;
+      - name: Replace ${{ REPO_NAME_PASCAL_CASE }} with RepoNamePascalCase in file and directory names
         run: |
-          find . -depth -name '*Backend.Api*' -execdir bash -c 'mv -i "$1" "${1//Backend.Api/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
+          find . -name .git -prune -o -name .github -prune -o -depth -name '*${{ REPO_NAME_PASCAL_CASE }}*' -execdir bash -c 'mv -i "$1" "${1//${{ REPO_NAME_PASCAL_CASE }}/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
       - name: Update README.md
         run: |
-          find . -depth -name 'CDP C# ASP.NET Backend Template' -execdir bash -c 'mv -i "$1" "${1//CDP C# ASP.NET Backend Template/${{ github.repository }}}"' bash {} \;        
+          find . -name .git -prune -o -name .github -prune -o -depth -name 'CDP C# ASP.NET Backend Template' -execdir bash -c 'mv -i "$1" "${1//CDP C# ASP.NET Backend Template/${{ github.repository }}}"' bash {} \;        
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions@github.com'
           git add .
           git commit -m "Applying template changes"
-          git push origin main      
-      
+          git push origin main
