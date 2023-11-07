@@ -35,8 +35,8 @@ if (builder.IsSwaggerEnabled())
 {
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
-    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 }
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 
