@@ -22,6 +22,7 @@ jobs:
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $2}')
           REPO_NAME_PASCAL_CASE=$(echo $REPO_NAME | sed -r 's/(^|-)([a-z])/\U\2/g')
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV 
           echo "REPO_NAME_PASCAL_CASE=$REPO_NAME_PASCAL_CASE" >> $GITHUB_ENV  
       - name: Replace Backend.Api with RepoNamePascalCase in files and update README.md
         run: |
