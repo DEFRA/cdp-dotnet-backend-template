@@ -30,6 +30,9 @@ builder.Services.AddSingleton<IMongoDbClientFactory>(_ =>
 // our service
 builder.Services.AddSingleton<IBookService, BookService>();
 
+// health checks
+builder.Services.AddHealthChecks();
+
 // swagger endpoints
 if (builder.IsSwaggerEnabled())
 {
@@ -46,6 +49,9 @@ if (builder.IsSwaggerEnabled())
     app.UseSwaggerUI();
 }
 
+app.UsePathBase("/cdp-demo-bristol-be");
+app.UseRouting();
 app.UseLibraryEndpoints();
+app.MapHealthChecks("/health");
 
 app.Run();

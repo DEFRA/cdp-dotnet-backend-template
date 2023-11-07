@@ -25,8 +25,9 @@ jobs:
           echo "REPO_NAME_PASCAL_CASE=$REPO_NAME_PASCAL_CASE" >> $GITHUB_ENV  
       - name: Replace Backend.Api with RepoNamePascalCase in files and update README.md
         run: |
+          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/cdp-dotnet-backend-template/${{ env.REPO_NAME }}/g' {} \;
           find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}/g' {} \;
-          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/CDP C# ASP.NET Backend Template/${{ env.REPO_NAME }}/g' {} \;
+          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/CDP C# ASP\.NET Backend Template/${{ env.REPO_NAME }}/g' {} \;
       - name: Replace Backend.Api with RepoNamePascalCase in file and directory names
         run: |
           find . -name .git -prune -o -name .github -prune -o -depth -name '*Backend\.Api*' -execdir bash -c 'mv -i "$1" "${1//Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
