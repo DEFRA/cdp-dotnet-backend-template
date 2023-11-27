@@ -45,3 +45,9 @@ jobs:
           git add -A
           git commit -m "Applying template changes"
           git push origin main
+          gh api \
+            --method PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/topics \
+            -f "names[]=cdp" -f "names[]=dotnet" -f "names[]=backend" -f "names[]=api" 
