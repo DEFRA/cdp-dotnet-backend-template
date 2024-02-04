@@ -2,6 +2,7 @@ using Backend.Api.Config;
 using Backend.Api.Data;
 using Backend.Api.Endpoints;
 using Backend.Api.Services;
+using Backend.Api.Utils;
 using FluentValidation;
 using Serilog;
 
@@ -21,6 +22,9 @@ var logger = new LoggerConfiguration()
 builder.Logging.AddSerilog(logger);
 
 logger.Information("Starting application");
+
+// Load certificates into Trust Store - Note must happen before Mongo and Http client connections 
+builder.SetupTrustStore(logger);
 
 // Mongo
 builder.Services.AddSingleton<IMongoDbClientFactory>(_ =>
