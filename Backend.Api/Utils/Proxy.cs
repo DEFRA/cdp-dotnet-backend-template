@@ -1,6 +1,6 @@
 using Serilog.Core;
 
-namespace Defra.Cdp.Backend.Api.Utils;
+namespace Backend.Api.Utils;
 
 public static class Proxy
 {

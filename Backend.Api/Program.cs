@@ -2,6 +2,7 @@ using Backend.Api.Config;
 using Backend.Api.Data;
 using Backend.Api.Endpoints;
 using Backend.Api.Services;
+using Backend.Api.Utils;
 using FluentValidation;
 using Serilog;
 
