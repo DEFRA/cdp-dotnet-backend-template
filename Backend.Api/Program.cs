@@ -33,6 +33,10 @@ builder.Services.AddSingleton<IBookService, BookService>();
 // health checks
 builder.Services.AddHealthChecks();
 
+// http client
+builder.Services.AddHttpClient();
+builder.Services.AddHttpProxyClient(logger);
+
 // swagger endpoints
 if (builder.IsSwaggerEnabled())
 {
