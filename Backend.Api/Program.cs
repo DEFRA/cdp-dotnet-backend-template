@@ -24,7 +24,7 @@ builder.Logging.AddSerilog(logger);
 logger.Information("Starting application");
 
 // Load certificates into Trust Store - Note must happen before Mongo and Http client connections 
-builder.SetupTrustStore(logger);
+TrustStore.SetupTrustStore(logger);
 
 // Mongo
 builder.Services.AddSingleton<IMongoDbClientFactory>(_ =>
