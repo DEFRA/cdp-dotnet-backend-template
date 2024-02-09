@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Serilog.Core;
@@ -6,24 +7,21 @@ namespace Backend.Api.Utils;
 
 public static class TrustStore
 {
-    private const string ConfigKey = "TrustStore";
-
-    public static void SetupTrustStore(this WebApplicationBuilder builder, Logger logger)
+    public static void SetupTrustStore(Logger logger)
     {
         logger.Information("Loading Certificates into Trust store");
-        var certificates = GetCertificates(builder.Configuration, logger);
+        var certificates = GetCertificates(logger);
         AddCertificates(certificates);
     }
 
-    private static List<string> GetCertificates(IConfiguration configuration, Logger logger)
+    private static List<string> GetCertificates(Logger logger)
     {
-        return configuration.GetSection(ConfigKey).GetChildren()
-            .Where(config => config.Value != null && IsBase64String(config.Value))
-            .Select((config, _) =>
+        return Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
+            .Where(entry => entry.Key.ToString().StartsWith("TRUSTSTORE") && IsBase64String(entry.Value.ToString()))
+            .Select(entry =>
             {
-                var configValue = config.Value;
-                var data = Convert.FromBase64String(configValue!);
-                logger.Information($"{ConfigKey}.{config.Key} certificate decoded");
+                var data = Convert.FromBase64String(entry.Value.ToString());
+                logger.Information($"{entry.Key} certificate decoded");
                 return Encoding.UTF8.GetString(data);
             }).ToList();
     }
