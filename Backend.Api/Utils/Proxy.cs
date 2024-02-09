@@ -11,21 +11,22 @@ public static class Proxy
       services.AddHttpClient(ProxyClient).ConfigurePrimaryHttpMessageHandler(() =>
       {
          // Note: HTTPS proxy isn't support in dotnet until dotnet 8
-         var proxyUri = Environment.GetEnvironmentVariable("CDP_HTTP_PROXY");
-         var proxy = new System.Net.WebProxy
+         var cdpHttpProxy = Environment.GetEnvironmentVariable("CDP_HTTP_PROXY");
+         if (cdpHttpProxy != null)
          {
-            BypassProxyOnLocal = true
-         };
-         if (proxyUri != null)
-         {
-            logger.Information("Creating proxy http client");
-            proxy.Address = new Uri(proxyUri);
+            var proxy = new System.Net.WebProxy
+            {
+               BypassProxyOnLocal = true,
+               Address = new Uri(cdpHttpProxy)
+            };
+            logger.Information("Creating proxy http client, {proxyUri}", cdpHttpProxy);
+            return new HttpClientHandler { Proxy = proxy, UseProxy = true };
          }
          else
          {
             logger.Warning("CDP_HTTP_PROXY is NOT set, proxy client will be disabled");
+            return new HttpClientHandler { UseProxy = false };
          }
-         return new HttpClientHandler { Proxy = proxy, UseProxy = proxyUri != null };
       });
    }
 }
