@@ -57,7 +57,6 @@ if (builder.IsSwaggerEnabled())
     app.UseSwaggerUI();
 }
 
-app.UsePathBase("/cdp-dotnet-backend-template");
 app.UseRouting();
 app.UseLibraryEndpoints();
 app.MapHealthChecks("/health");
