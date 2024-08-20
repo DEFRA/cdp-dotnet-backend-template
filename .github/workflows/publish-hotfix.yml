@@ -14,13 +14,13 @@ env:
 
 jobs:
   build:
-    name: CDP-build-workflow
+    name: CDP-build-hotfix-workflow
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for branch-based versioning to work
+          fetch-depth: 0 # Depth 0 required for branch-based versioning
       
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main
