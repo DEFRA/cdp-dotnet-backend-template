@@ -7,6 +7,14 @@ public static class Proxy
 {
     public const string ProxyClient = "proxy";
 
+    /**
+     * A preconfigured HTTP Client that uses the Platform's outbound proxy.
+     * 
+     * Usage:
+     *  1. inject an `IHttpClientFactory` into your class.
+     *  2. Use the IHttpClientFactory to create a named instance of HttpClient:
+     *     `clientFactory.CreateClient(Proxy.ProxyClient);`
+     */
     public static void AddHttpProxyClient(this IServiceCollection services, Logger logger)
     {
         services.AddHttpClient(ProxyClient).ConfigurePrimaryHttpMessageHandler(() =>
@@ -18,14 +26,20 @@ public static class Proxy
             };
             if (proxyUri != null)
             {
-                var uri = new Uri(proxyUri);
                 logger.Debug("Creating proxy http client");
-                proxy.Address = uri;
+                var uri = new UriBuilder(proxyUri);
 
-                var credentials = GetCredentialsFromUri(uri) ?? GetCredentialsFromEnv();
-                if (credentials == null) return new HttpClientHandler { Proxy = proxy, UseProxy = true };
-                logger.Debug("Setting proxy credentials");
-                proxy.Credentials = credentials;
+                var credentials = GetCredentialsFromUri(uri);
+                if (credentials != null)
+                {
+                    logger.Debug("Setting proxy credentials");
+                    proxy.Credentials = credentials;    
+                }
+
+                // Remove credentials from URI to so they don't get logged.
+                uri.UserName = "";
+                uri.Password = "";
+                proxy.Address = uri.Uri;
             }
             else
             {
@@ -34,23 +48,14 @@ public static class Proxy
             return new HttpClientHandler { Proxy = proxy, UseProxy = proxyUri != null};
         });
     }
-
-    private static NetworkCredential? GetCredentialsFromUri(Uri uri)
-    {
-        var split = uri.UserInfo.Split(':');
-        return split.Length == 2 ? new NetworkCredential(split[0], split[1]) : null;
-    }
     
-    private static NetworkCredential? GetCredentialsFromEnv()
+    private static NetworkCredential? GetCredentialsFromUri(UriBuilder uri)
     {
-        var proxyUsername = Environment.GetEnvironmentVariable("SQUID_USERNAME");
-        var proxyPassword = Environment.GetEnvironmentVariable("SQUID_PASSWORD");
-        if (proxyUsername != null && proxyPassword != null)
-        {
-            return new NetworkCredential(proxyUsername, proxyPassword);
-        }
-
-        return null;
+        var username = uri.UserName;
+        var password = uri.Password;
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password)) return null;
+        return new NetworkCredential(username, password);
     }
+
 }
 
