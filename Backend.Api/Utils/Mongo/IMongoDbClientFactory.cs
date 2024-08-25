@@ -1,10 +1,10 @@
 using MongoDB.Driver;
 
-namespace Backend.Api.Data;
+namespace Backend.Api.Utils.Mongo;
 
 public interface IMongoDbClientFactory
 {
-    protected IMongoClient CreateClient();
+    IMongoClient GetClient();
 
     IMongoCollection<T> GetCollection<T>(string collection);
 }
