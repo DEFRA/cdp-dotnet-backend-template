@@ -12,7 +12,7 @@ services:
       "--tlsCertificateKeyFile", "etc/ssl/mongodb.pem"
     ]
   service:
-    image: cdp-dotnet-backend-template
+    image: service-backend
     networks:
       - cdp-network
     ports:

@@ -12,7 +12,7 @@ on:
       - ready_for_review
 
 env:
-  SERVICE_NAME: my-service
+  SERVICE_NAME: service-backend
 
 jobs:
   pr-validator:
