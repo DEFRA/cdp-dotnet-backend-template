@@ -1,9 +1,10 @@
 #!/bin/bash
 
-repository=$1
+repository="$1"
 
 REPO_NAME=$(echo "${repository}" | awk -F '/' '{print $2}')
 REPO_NAME_PASCAL_CASE=$(echo "$REPO_NAME" | sed -r 's/(^|-)([a-z])/\U\2/g')
+echo "${REPO_NAME} ${REPO_NAME_PASCAL_CASE} $repository"
 
 find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i "s/cdp-dotnet-backend-template/${REPO_NAME}/g" {} \;
 find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i "s/Backend\.Api/${REPO_NAME_PASCAL_CASE}/g" {} \;
