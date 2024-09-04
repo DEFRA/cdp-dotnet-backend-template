@@ -11,9 +11,6 @@ on:
       - synchronize
       - ready_for_review
 
-env:
-  SERVICE_NAME: service-backend
-
 jobs:
   pr-validator:
     name: Run Pull Request Checks
@@ -22,9 +19,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Apply template
-        run: .github/template/apply.sh ${{ env.SERVICE_NAME }}
+        run: .github/template/apply.sh DEFRA/service-backend
       - name: Build image
         run: |
-          docker build -t ${{ env.SERVICE_NAME }} .
+          docker build -t service-backend .
       - name: Check container starts in production-like mode
         run: .github/template/validate.sh
