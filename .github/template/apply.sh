@@ -17,7 +17,6 @@ echo "CDP C# ASP\.NET Backend Template -> ${REPO_NAME}"
 find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i "s/CDP C# ASP\.NET Backend Template/${REPO_NAME}/g" {} \;
 
 echo "Moving Backend\.Api* -> ${REPO_NAME_PASCAL_CASE}"
-find . -depth -name .git -prune -o -name .github -prune -o -name 'Backend\.Api*' -execdir bash -c 'mv -f "$1" "${1//Backend\.Api/${REPO_NAME_PASCAL_CASE}}"' bash {} \;   
 mv './Backend.Api/Backend.Api.csproj' "./Backend.Api/${REPO_NAME_PASCAL_CASE}.csproj"
 mv './Backend.Api.Test/Backend.Api.Test.csproj' "./Backend.Api.Test/${REPO_NAME_PASCAL_CASE}.Test.csproj"
 mv './Backend.Api' "${REPO_NAME_PASCAL_CASE}"
