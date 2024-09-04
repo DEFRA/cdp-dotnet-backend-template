@@ -1,5 +1,4 @@
 #!/bin/bash
-
-rm .github/template.yml
-rm .github/validate-template.yml
+rm .github/workflows/template.yml
+rm .github/workflows/validate-template.yml
 rm -rf .github/template/
