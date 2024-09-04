@@ -62,7 +62,7 @@ export MONGODB_TEST_CA_PEM=$mongodbTestCaPem
 
 
 # Start mongodb + templated service
-docker compose -f "$compose_file" up --wait --wait-timeout 60 
+docker compose -f "$compose_file" up --wait --wait-timeout 60 --quiet-pull
 
  
 # Check its using ECS
