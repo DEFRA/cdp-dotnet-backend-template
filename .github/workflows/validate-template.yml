@@ -1,0 +1,30 @@
+name: Check Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+
+env:
+  SERVICE_NAME: my-service
+
+jobs:
+  pr-validator:
+    name: Run Pull Request Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Apply template
+        run: .github/template/apply.sh ${{ env.SERVICE_NAME }}
+      - name: Build image
+        run: |
+          docker build -t ${{ env.SERVICE_NAME }} .
+      - name: Check container starts in production-like mode
+        run: .github/template/validate.sh
