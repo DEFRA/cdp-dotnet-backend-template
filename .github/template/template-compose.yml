@@ -21,7 +21,7 @@ services:
       - mongodb
     environment:
       ASPNETCORE_URLS: "http://+:8085"
-      Mongo__DatabaseUri: "mongodb://mongodb:27017/?tls=true&tlsInsecure=true"
+      Mongo__DatabaseUri: "mongodb://mongodb:27017/?tls=true"
       TRUSTSTORE_MONGO: ${MONGODB_TEST_CA_PEM}
 
 networks:
