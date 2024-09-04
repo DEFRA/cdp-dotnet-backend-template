@@ -18,6 +18,10 @@ find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i "s/CDP 
 
 echo "Moving Backend\.Api* -> ${REPO_NAME_PASCAL_CASE}"
 find . -depth -name .git -prune -o -name .github -prune -o -name 'Backend\.Api*' -execdir bash -c 'mv -f "$1" "${1//Backend\.Api/${REPO_NAME_PASCAL_CASE}}"' bash {} \;   
+mv './Backend.Api/Backend.Api.csproj' "./Backend.Api/${REPO_NAME_PASCAL_CASE}.csproj"
+mv './Backend.Api.Test/Backend.Api.Test.csproj' "./Backend.Api.Test/${REPO_NAME_PASCAL_CASE}.Test.csproj"
+mv './Backend.Api' "${REPO_NAME_PASCAL_CASE}"
+mv './Backend.Api.Test' "${REPO_NAME_PASCAL_CASE}.Test"
 
 echo "Renaming CdpDotnetBackendTemplate.sln -> ${REPO_NAME_PASCAL_CASE}.sln"   
 mv CdpDotnetBackendTemplate.sln "${REPO_NAME_PASCAL_CASE}".sln  
