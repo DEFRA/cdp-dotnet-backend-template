@@ -46,13 +46,13 @@ cleanup() {
     docker compose -f "$compose_file" down
 }
 
-
 trap cleanup EXIT
 
 # Exit on errors
 set -e
  
 # Generate Self Signed Certs
+mkdir -p .github/template/ssl
 openssl req -newkey rsa:2048 -new -x509 -days 365 -nodes -out .github/template/ssl/mongodb-cert.crt -keyout .github/template/ssl/mongodb-cert.key \
 -subj "/C=UK/ST=STATE/L=CITY/O=ORG_NAME/OU=OU_NAME/CN=mongodb" \
 -addext "subjectAltName = DNS:localhost, DNS:mongodb"
