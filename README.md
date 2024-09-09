@@ -2,6 +2,12 @@
 
 Core delivery C# ASP.NET backend template.
 
+* [Install MongoDB](#install-mongodb)
+* [Inspect MongoDB](#inspect-mongodb)
+* [Testing](#testing)
+* [Running](#running)
+* [Dependabot](#dependabot)
+
 ### Install MongoDB
 - Install [MongoDB](https://www.mongodb.com/docs/manual/tutorial/#installation) on your local machine
 - Start MongoDB:
@@ -33,3 +39,8 @@ Run CDP-Deployments application:
 ```bash
 dotnet run --project Backend.Api --launch-profile Development
 ```
+
+### Dependabot
+
+We have added an example dependabot configuration file to the repository. You can enable it by renaming
+the [.github/example.dependabot.yml](.github/example.dependabot.yml) to `.github/dependabot.yml`
