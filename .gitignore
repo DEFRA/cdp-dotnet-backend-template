@@ -266,3 +266,4 @@ __pycache__/
 .DS_Store
 
 library.db
+.envrc
