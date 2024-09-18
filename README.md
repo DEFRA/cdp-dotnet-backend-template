@@ -40,6 +40,10 @@ Run CDP-Deployments application:
 dotnet run --project Backend.Api --launch-profile Development
 ```
 
+### SonarCloud
+
+Example SonarCloud configuration are available in the GitHub Action workflows.
+
 ### Dependabot
 
 We have added an example dependabot configuration file to the repository. You can enable it by renaming
