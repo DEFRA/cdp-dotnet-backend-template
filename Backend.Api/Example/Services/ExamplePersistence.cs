@@ -1,7 +1,7 @@
 ﻿using Backend.Api.Example.Models;
 using Backend.Api.Utils.Mongo;
 using MongoDB.Driver;
-using System.Diagnostics.CodeAnalysis;
+// using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Example.Services;
 
@@ -26,7 +26,7 @@ public interface IExamplePersistence
  * ensure the indexes for this collection are created on startup.
  */
 
- [ExcludeFromCodeCoverage]
+//  [ExcludeFromCodeCoverage]
 public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILoggerFactory loggerFactory)
     : MongoService<ExampleModel>(connectionFactory, "example", loggerFactory), IExamplePersistence
 {
@@ -39,7 +39,7 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
         }
         catch (Exception e)
         {
-            _logger.LogError(e.Message);
+            _logger.LogError(e, "Failed to insert {example}", example);
             return false;
         }
     }
@@ -47,7 +47,7 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
     public async Task<ExampleModel?> GetByExampleName(string name)
     {
         var result = await Collection.Find(b => b.Name == name).FirstOrDefaultAsync();
-        _logger.LogInformation("Searching for {name}, found {result}", name, result);
+        _logger.LogInformation("Searching for {Name}, found {Result}", name, result);
         return result;
     }
 
