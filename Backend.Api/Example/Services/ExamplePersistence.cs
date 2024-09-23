@@ -1,6 +1,7 @@
-﻿using Backend.Api.Example.Models;
+using Backend.Api.Example.Models;
 using Backend.Api.Utils.Mongo;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Example.Services;
 
@@ -42,20 +43,20 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
         }
     }
 
-    public async Task<ExampleModel?> GetByExampleName(string name)
+   [ExcludeFromCodeCoverage]
     {
         var result = await Collection.Find(b => b.Name == name).FirstOrDefaultAsync();
         _logger.LogInformation("Searching for {Name}, found {Result}", name, result);
         return result;
     }
 
-    public async Task<IEnumerable<ExampleModel>> GetAllAsync()
+   [ExcludeFromCodeCoverage]
     {
         return await Collection.Find(_ => true).ToListAsync();
     }
 
     public async Task<IEnumerable<ExampleModel>> SearchByValueAsync(string searchTerm)
-    {
+   [ExcludeFromCodeCoverage]
         var searchOptions = new TextSearchOptions { CaseSensitive = false, DiacriticSensitive = false };
         var filter = Builders<ExampleModel>.Filter.Text(searchTerm, searchOptions);
         var result = await Collection.Find(filter).ToListAsync();
@@ -67,7 +68,7 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
      * Rather than replacing the whole record we selectively $set and $inc fields while leaving others
      * unchanged.
      */
-    public async Task<bool> UpdateAsync(ExampleModel example)
+   [ExcludeFromCodeCoverage]
     {
         var filter = Builders<ExampleModel>.Filter.Eq(e => e.Name, example.Name);
         var update = Builders<ExampleModel>.Update
@@ -78,7 +79,7 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
         return result.ModifiedCount > 0;
     }
 
-    public async Task<bool> DeleteAsync(string name)
+   [ExcludeFromCodeCoverage]
     {
         var result = await Collection.DeleteOneAsync(e => e.Name == name);
         return result.DeletedCount > 0;
@@ -89,7 +90,7 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
      * In this example it creates a single index on the `name` field. The Unique flag is set preventing duplicate names
      * being inserted.
      */
-    protected override List<CreateIndexModel<ExampleModel>> DefineIndexes(IndexKeysDefinitionBuilder<ExampleModel> builder)
+   [ExcludeFromCodeCoverage]
     {
         var options = new CreateIndexOptions { Unique = true };
         var nameIndex = new CreateIndexModel<ExampleModel>(builder.Ascending(e => e.Name), options);

@@ -47,8 +47,6 @@ public class ExamplePersistenceTests
           .InsertOneAsync(Arg.Any<ExampleModel>())
           .Returns(Task.CompletedTask);
 
-
-
       var example = new ExampleModel()
       {
          Id = new ObjectId(),
@@ -60,33 +58,4 @@ public class ExamplePersistenceTests
       result.Should().BeTrue();
    }
 
-   // [Fact]
-   // public async Task GetNameOk()
-   // {
-   //    var example = new ExampleModel()
-   //    {
-   //       Id = new ObjectId(),
-   //       Value = "some value",
-   //       Name = "Test",
-   //       Counter = 0
-   //    };
-
-   //    var cursorMock = Substitute.For<IAsyncCursor<ExampleModel>>();
-   //    cursorMock.MoveNextAsync().Returns(Task.FromResult(true), Task.FromResult(false));
-   //    cursorMock.Current.Returns(new[] { example });
-
-   //    var findFluent = Substitute.For<IFindFluent<ExampleModel, ExampleModel>>();
-   //    findFluent.ToCursorAsync().Returns(Task.FromResult(cursorMock));
-   //    findFluent.Limit(1).Returns(findFluent);
-
-
-   // _collectionMock
-   //     .Find(Arg.Any<FilterDefinition<ExampleModel>>())
-   //      //   .Returns(new FakeFindFluent<ExampleModel, ExampleModel>(new List<ExampleModel> { example }));
-   //      .Returns(findFluent);
-
-   // var result = await _persistence.GetByExampleName("Test");
-   // result.Should().Be(example);
-
-   // }
 }
