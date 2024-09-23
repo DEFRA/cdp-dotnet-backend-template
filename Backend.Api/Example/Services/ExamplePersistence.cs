@@ -1,6 +1,7 @@
 ﻿using Backend.Api.Example.Models;
 using Backend.Api.Utils.Mongo;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Example.Services;
 
@@ -22,8 +23,10 @@ public interface IExamplePersistence
 /**
  * An example of how to persist data in MongoDB.
  * The base class `MongoService` provides access to the db collection as well as providing helpers to
- * ensure the indexes for this collection are created on startup.  
+ * ensure the indexes for this collection are created on startup.
  */
+
+ [ExcludeFromCodeCoverage]
 public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILoggerFactory loggerFactory)
     : MongoService<ExampleModel>(connectionFactory, "example", loggerFactory), IExamplePersistence
 {

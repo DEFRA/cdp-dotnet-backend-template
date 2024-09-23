@@ -2,9 +2,11 @@ using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Serilog.Core;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils;
 
+ [ExcludeFromCodeCoverage]
 public static class TrustStore
 {
     public static void AddCustomTruststore(this IServiceCollection _, Logger logger)

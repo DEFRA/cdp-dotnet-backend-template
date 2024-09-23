@@ -2,9 +2,11 @@
 using Backend.Api.Example.Services;
 using FluentValidation;
 using FluentValidation.Results;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Example.Endpoints;
 
+ [ExcludeFromCodeCoverage]
 public static class ExampleEndpoints
 {
     public static void UseExampleEndpoints(this IEndpointRouteBuilder app)

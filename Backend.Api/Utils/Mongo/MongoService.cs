@@ -1,7 +1,9 @@
 ﻿using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils.Mongo;
 
+ [ExcludeFromCodeCoverage]
 public abstract class MongoService<T>
 {
     protected readonly IMongoClient Client;

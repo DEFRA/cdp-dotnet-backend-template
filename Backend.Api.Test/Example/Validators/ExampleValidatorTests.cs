@@ -5,10 +5,10 @@ using MongoDB.Bson;
 
 namespace Backend.Api.Test.Example.Validators;
 
-public class ExampleTests
+public class ExampleValidatorTests
 {
     private readonly ExampleValidator _validator = new();
-    
+
     [Fact]
     public void ValidModel()
     {
@@ -22,7 +22,7 @@ public class ExampleTests
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveAnyValidationErrors();
     }
-    
+
     [Fact]
     public void InvalidName()
     {
@@ -35,7 +35,7 @@ public class ExampleTests
         var result = _validator.TestValidate(model);
         result.ShouldHaveValidationErrorFor(b => b.Name);
     }
-    
+
     [Fact]
     public void InvalidCounter()
     {
@@ -45,12 +45,12 @@ public class ExampleTests
             Value = "Some value",
             Name = "Test",
             Counter = -1
-            
+
         };
         var result = _validator.TestValidate(model);
         result.ShouldHaveValidationErrorFor(b => b.Counter);
     }
-    
+
     [Fact]
     public void EmptyValue()
     {
@@ -60,7 +60,7 @@ public class ExampleTests
             Value = "",
             Name = "Test",
             Counter = 0
-            
+
         };
         var result = _validator.TestValidate(model);
         result.ShouldHaveValidationErrorFor(b => b.Value);
