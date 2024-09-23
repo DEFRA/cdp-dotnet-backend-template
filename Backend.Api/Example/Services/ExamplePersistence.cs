@@ -1,7 +1,6 @@
 ﻿using Backend.Api.Example.Models;
 using Backend.Api.Utils.Mongo;
 using MongoDB.Driver;
-// using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Example.Services;
 
@@ -26,7 +25,6 @@ public interface IExamplePersistence
  * ensure the indexes for this collection are created on startup.
  */
 
-//  [ExcludeFromCodeCoverage]
 public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILoggerFactory loggerFactory)
     : MongoService<ExampleModel>(connectionFactory, "example", loggerFactory), IExamplePersistence
 {
