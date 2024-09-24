@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils.Logging;
 
- [ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage]
 /**
  * Maps log levels from the C# default 'Information' etc to the node style 'info'.
  */

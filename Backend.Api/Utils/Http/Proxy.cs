@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Backend.Api.Utils.Http;
 
 
- [ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage]
 public static class Proxy
 {
     public const string ProxyClient = "proxy";
