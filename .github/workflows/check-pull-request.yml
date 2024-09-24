@@ -70,19 +70,11 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar-coverage
       - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        #   shell: powershell
-        #   run: |
-        #     New-Item -Path .\.sonar\scanner -ItemType Directory
-        #     dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
         run: |
           mkdir -p ./.sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
       - name: Install dotNet code coverage
         if: steps.cache-sonar-coverage.outputs.cache-hit != 'true'
-        #   shell: powershell
-        #   run: |
-        #     New-Item -Path .\.sonar\coverage -ItemType Directory
-        #     dotnet tool update dotnet-coverage --tool-path .\.sonar\coverage
         run: |
           mkdir -p ./.sonar/coverage
           dotnet tool update dotnet-coverage --tool-path ./.sonar/coverage
@@ -91,12 +83,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        #   shell: powershell
-        #   run: |
-        #     .\.sonar\scanner\dotnet-sonarscanner begin /k:"DEFRA_cdp-dotnet-backend-template" /o:"defra" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-        #     dotnet build --no-incremental
-        #     .\.sonar\coverage\dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
-        #     .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin /k:"DEFRA_cdp-dotnet-backend-template" /o:"defra" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build --no-incremental
