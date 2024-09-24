@@ -9,7 +9,7 @@ namespace Backend.Api.Utils.Mongo;
 public class MongoDbClientFactory : IMongoDbClientFactory
 {
     private readonly IMongoDatabase _mongoDatabase;
-    private readonly IMongoClient _client;
+   private readonly MongoClient _client;
 
     public MongoDbClientFactory(string? connectionString, string databaseName)
     {
