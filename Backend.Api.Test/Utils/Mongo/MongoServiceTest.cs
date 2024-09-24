@@ -1,11 +1,8 @@
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NSubstitute;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging.Abstractions;
-// using Xunit;
 using Backend.Api.Utils.Mongo;
-using SharpCompress.Crypto;
 
 namespace Backend.Api.Tests.Utils.Mongo
 {
