@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils.Mongo;
 
- [ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage]
 
 public class MongoDbClientFactory : IMongoDbClientFactory
 {
