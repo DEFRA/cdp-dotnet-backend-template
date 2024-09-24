@@ -21,10 +21,21 @@ public static class Proxy
    {
       services.AddHttpClient(ProxyClient).ConfigurePrimaryHttpMessageHandler(() =>
       {
-         var proxyUri = Environment.GetEnvironmentVariable("CDP_HTTPS_PROXY");
-         var proxy = CreateProxy(proxyUri, logger);
-         return new HttpClientHandler { Proxy = proxy, UseProxy = proxyUri != null };
+         return ConfigurePrimaryHttpMessageHandler(logger);
       });
+   }
+
+   [ExcludeFromCodeCoverage]
+   public static HttpClientHandler ConfigurePrimaryHttpMessageHandler(Logger logger)
+   {
+      var proxyUri = Environment.GetEnvironmentVariable("CDP_HTTPS_PROXY");
+      return CreateHttpClientHandler(proxyUri, logger);
+   }
+
+   public static HttpClientHandler CreateHttpClientHandler(string? proxyUri, Logger logger)
+   {
+      var proxy = CreateProxy(proxyUri, logger);
+      return new HttpClientHandler { Proxy = proxy, UseProxy = proxyUri != null };
    }
 
    public static WebProxy CreateProxy(string? proxyUri, Logger logger)

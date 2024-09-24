@@ -13,6 +13,10 @@ public class ProxyTest
 
    private readonly Logger logger = new LoggerConfiguration().CreateLogger();
 
+   private readonly string proxyUri = "http://user:password@localhost:8080";
+   private readonly string localProxy = "http://localhost:8080/";
+   private readonly string localhost = "http://localhost/";
+
    public ProxyTest()
    {
    }
@@ -20,7 +24,6 @@ public class ProxyTest
    [Fact]
    public void ExtractProxyCredentials()
    {
-      var proxyUri = "http://user:password@localhost:8080";
 
       var proxy = new System.Net.WebProxy
       {
@@ -38,14 +41,14 @@ public class ProxyTest
    [Fact]
    public void ExtractProxyEmptyCredentials()
    {
-      var proxyUri = "http://user@localhost:8080";
+      var noPasswordUri = "http://user@localhost:8080";
 
       var proxy = new System.Net.WebProxy
       {
          BypassProxyOnLocal = true
       };
 
-      Proxy.ConfigureProxy(proxy, proxyUri, logger);
+      Proxy.ConfigureProxy(proxy, noPasswordUri, logger);
 
       proxy.Credentials.Should().BeNull();
    }
@@ -53,7 +56,6 @@ public class ProxyTest
    [Fact]
    public void ExtractProxyUri()
    {
-      var proxyUri = "http://user:password@localhost:8080";
 
       var proxy = new System.Net.WebProxy
       {
@@ -62,18 +64,17 @@ public class ProxyTest
 
       Proxy.ConfigureProxy(proxy, proxyUri, logger);
       proxy.Address.Should().NotBeNull();
-      proxy.Address?.AbsoluteUri.Should().Be("http://localhost:8080/");
+      proxy.Address?.AbsoluteUri.Should().Be(localProxy);
    }
 
    [Fact]
    public void CreateProxyFromUri()
    {
-      var proxyUri = "http://user:password@localhost:8080";
 
       var proxy = Proxy.CreateProxy(proxyUri, logger);
 
       proxy.Address.Should().NotBeNull();
-      proxy.Address?.AbsoluteUri.Should().Be("http://localhost:8080/");
+      proxy.Address?.AbsoluteUri.Should().Be(localProxy);
    }
 
    [Fact]
@@ -87,13 +88,26 @@ public class ProxyTest
    [Fact]
    public void ProxyShouldBypassLocal()
    {
-      var proxyUri = "http://user:password@localhost:8080";
 
       var proxy = Proxy.CreateProxy(proxyUri, logger);
 
       proxy.BypassProxyOnLocal.Should().BeTrue();
-      proxy.IsBypassed(new Uri("http://localhost")).Should().BeTrue();
+      proxy.IsBypassed(new Uri(localhost)).Should().BeTrue();
       proxy.IsBypassed(new Uri("https://defra.gov.uk")).Should().BeFalse();
+   }
+
+   [Fact]
+   public void HandlerShouldHaveProxy()
+   {
+      var handler = Proxy.CreateHttpClientHandler(proxyUri, logger);
+
+      handler.Proxy.Should().NotBeNull();
+      handler.UseProxy.Should().BeTrue();
+      handler.Proxy?.Credentials.Should().NotBeNull();
+      handler.Proxy?.GetProxy(new Uri(localhost)).Should().NotBeNull();
+      handler.Proxy?.GetProxy(new Uri("http://google.com")).Should().NotBeNull();
+      handler.Proxy?.GetProxy(new Uri(localhost))?.AbsoluteUri.Should().Be(localhost);
+      handler.Proxy?.GetProxy(new Uri("http://google.com"))?.AbsoluteUri.Should().Be(localProxy);
    }
 
 
