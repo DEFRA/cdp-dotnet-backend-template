@@ -70,15 +70,21 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar-coverage
       - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
+        #   shell: powershell
+        #   run: |
+        #     New-Item -Path .\.sonar\scanner -ItemType Directory
+        #     dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
         run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
+          mkdir -p .\.sonar\scanner
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - name: Install dotNet code coverage
         if: steps.cache-sonar-coverage.outputs.cache-hit != 'true'
-        shell: powershell
+        #   shell: powershell
+        #   run: |
+        #     New-Item -Path .\.sonar\coverage -ItemType Directory
+        #     dotnet tool update dotnet-coverage --tool-path .\.sonar\coverage
         run: |
-          New-Item -Path .\.sonar\coverage -ItemType Directory
+          mkdir -p .\.sonar\scanner
           dotnet tool update dotnet-coverage --tool-path .\.sonar\coverage
       - name: Build and analyze
         if: github.actor != 'dependabot[bot]'
