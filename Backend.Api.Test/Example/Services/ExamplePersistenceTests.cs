@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using Backend.Api.Utils.Mongo;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Backend.Api.Example.Models;
@@ -56,6 +57,33 @@ public class ExamplePersistenceTests
       };
       var result = await _persistence.CreateAsync(example);
       result.Should().BeTrue();
+   }
+
+   [Fact]
+   public async Task CreateAsyncLogError()
+   {
+
+      var loggerFactoryMock = Substitute.For<ILoggerFactory>();
+      var logMock = Substitute.For<ILogger<ExamplePersistence>>();
+      loggerFactoryMock.CreateLogger<ExamplePersistence>().Returns(logMock);
+
+      _collectionMock
+          .InsertOneAsync(Arg.Any<ExampleModel>())
+          .Returns(Task.FromException<ExampleModel>(new Exception()));
+
+      var persistence = new ExamplePersistence(_conFactoryMock, loggerFactoryMock);
+
+      var example = new ExampleModel()
+      {
+         Id = new ObjectId(),
+         Value = "some value",
+         Name = "Test",
+         Counter = 0
+      };
+
+      var result = await persistence.CreateAsync(example);
+
+      result.Should().BeFalse();
    }
 
 }
