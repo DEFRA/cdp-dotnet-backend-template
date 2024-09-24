@@ -1,7 +1,9 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils.Mongo;
 
+[ExcludeFromCodeCoverage]
 public abstract class MongoService<T>
 {
     protected readonly IMongoClient Client;
@@ -20,7 +22,7 @@ public abstract class MongoService<T>
 
     protected abstract List<CreateIndexModel<T>> DefineIndexes(IndexKeysDefinitionBuilder<T> builder);
 
-    private void EnsureIndexes()
+   protected void EnsureIndexes()
     {
         var builder = Builders<T>.IndexKeys;
         var indexes = DefineIndexes(builder);

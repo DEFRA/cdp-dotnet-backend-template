@@ -1,9 +1,10 @@
 using Serilog.Core;
 using Serilog.Events;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils.Logging;
 
-
+ [ExcludeFromCodeCoverage]
 /**
  * Maps log levels from the C# default 'Information' etc to the node style 'info'.
  */
