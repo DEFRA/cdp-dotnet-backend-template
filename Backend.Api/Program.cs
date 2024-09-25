@@ -11,11 +11,12 @@ using System.Diagnostics.CodeAnalysis;
 
 //-------- Configure the WebApplication builder------------------//
 
-CreateAndRunWebApplication(args);
+var app = CreateWebApplication(args);
+await app.RunAsync();
 
 
 [ExcludeFromCodeCoverage]
-static async void CreateAndRunWebApplication(string[] args)
+static WebApplication CreateWebApplication(string[] args)
 {
    var _builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,7 @@ static async void CreateAndRunWebApplication(string[] args)
 
    var _app = BuildWebApplication(_builder);
 
-   await _app.RunAsync();
+   return _app;
 }
 
 [ExcludeFromCodeCoverage]
