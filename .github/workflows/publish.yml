@@ -26,11 +26,11 @@ jobs:
         uses: DEFRA/cdp-build-action/build@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-## SonarCloud
-## Uncomment to unable SonarCloud scan
-## Requires project to be set up in SonarCloud
-## and the SonarCloud token to be set in the repository secrets
-#  sonarcloud-scan:
+  ## SonarCloud
+  ## Uncomment to unable SonarCloud scan
+  ## Requires project to be set up in SonarCloud
+  ## and the SonarCloud token to be set in the repository secrets
+#   sonarcloud-scan:
 #     name: CDP SonarCloud Scan
 #     uses: ./.github/workflows/sonarcloud.yml
 #     needs: build
