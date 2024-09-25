@@ -11,7 +11,7 @@ permissions:
 jobs:
   build:
     if: github.run_number != 1
-    name: CDP-sonarcloud-workflow
+    name: CDP SonarCloud coverage scan
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK 17
