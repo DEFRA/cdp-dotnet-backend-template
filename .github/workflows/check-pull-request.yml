@@ -11,80 +11,25 @@ on:
       - synchronize
       - ready_for_review
 
-# Comment/Uncomment the desired jobs section below
-
-# Non Sonar cloud version
-# jobs:
-#   pr-validator:
-#     name: Run Pull Request Checks
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Check out code
-#         uses: actions/checkout@v3
-#       - name: Test
-#         uses: actions/setup-dotnet@v3
-#         with:
-#           dotnet-version: |
-#             8.0
-#       - run: dotnet test
-
-# Sonar cloud version
 jobs:
   pr-validator:
     name: Run Pull Request Checks
     runs-on: ubuntu-latest
     steps:
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: "zulu"
       - name: Check out code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Set up .NET 8.0
+        uses: actions/checkout@v3
+      - name: Test
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             8.0
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache SonarCloud scanner
-        id: cache-sonar-scanner
-        uses: actions/cache@v4
-        with:
-          path: ./.sonar/scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
-      - name: Cache dotNet code coverage
-        id: cache-sonar-coverage
-        uses: actions/cache@v4
-        with:
-          path: ./.sonar/coverage
-          key: ${{ runner.os }}-sonar-coverage
-          restore-keys: ${{ runner.os }}-sonar-coverage
-      - name: Install SonarCloud scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ./.sonar/scanner
-          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-      - name: Install dotNet code coverage
-        if: steps.cache-sonar-coverage.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ./.sonar/coverage
-          dotnet tool update dotnet-coverage --tool-path ./.sonar/coverage
-      - name: Build and analyze
-        if: github.actor != 'dependabot[bot]'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin /k:"DEFRA_cdp-dotnet-backend-template" /o:"defra" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-          dotnet build --no-incremental
-          ./.sonar/coverage/dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
-          ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      - run: dotnet test
+    ## SonarCloud
+    ## Uncomment to unable SonarCloud scan
+    ## Requires project to be set up in SonarCloud
+    ## and the SonarCloud token to be set in the repository secrets
+  sonarcloud-scan:
+    name: CDP SonarCloud Scan
+    uses: ./.github/workflows/sonarcloud.yml
+    needs: pr-validator
+    secrets: inherit
