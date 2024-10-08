@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Apply template
         run: |
-          .github/template/apply.sh
+          .github/template/apply.sh ${{ github.repository }}
       - name: Cleanup
         run: |
           .github/template/cleanup.sh

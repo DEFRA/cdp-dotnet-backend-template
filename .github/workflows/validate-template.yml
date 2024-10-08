@@ -20,8 +20,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Apply template
         run: .github/template/apply.sh DEFRA/service-backend
-      - name: Build image
-        run: |
-          docker build -t service-backend .
       - name: Check container starts in production-like mode
         run: .github/template/validate.sh

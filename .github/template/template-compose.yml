@@ -1,4 +1,3 @@
-version: '3.4'
 services:
   mongodb:
     container_name: mongodb
@@ -12,7 +11,10 @@ services:
       "--tlsCertificateKeyFile", "etc/ssl/mongodb.pem"
     ]
   service:
-    image: service-backend
+    build:
+      context: ../..
+    container_name: cdp-dotnet-backend-template
+    image: cdp-dotnet-backend-template
     networks:
       - cdp-network
     ports:
