@@ -18,26 +18,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Set RepoNamePascalCase
+      - name: Apply template
         run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $2}')
-          REPO_NAME_PASCAL_CASE=$(echo $REPO_NAME | sed -r 's/(^|-)([a-z])/\U\2/g')
-          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV 
-          echo "REPO_NAME_PASCAL_CASE=$REPO_NAME_PASCAL_CASE" >> $GITHUB_ENV  
-      - name: Replace Backend.Api with RepoNamePascalCase in files and update README.md
+          .github/template/apply.sh ${{ github.repository }}
+      - name: Cleanup
         run: |
-          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/cdp-dotnet-backend-template/${{ env.REPO_NAME }}/g' {} \;
-          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}/g' {} \;
-          find . -name .git -prune -o -name .github -prune -o -type f -exec sed -i 's/CDP C# ASP\.NET Backend Template/${{ env.REPO_NAME }}/g' {} \;
-      - name: Replace Backend.Api with RepoNamePascalCase in file and directory names
-        run: |
-          find . -name .git -prune -o -name .github -prune -o -depth -name '*Backend\.Api*' -execdir bash -c 'mv -i "$1" "${1//Backend\.Api/${{ env.REPO_NAME_PASCAL_CASE }}}"' bash {} \;   
-      - name: Rename the Solution
-        run: |
-          mv CdpDotnetBackendTemplate.sln ${{ env.REPO_NAME_PASCAL_CASE }}.sln  
-      - name: Remove template
-        run: |
-          rm .github/workflows/template.yml      
+          .github/template/cleanup.sh
       - name: Commit and push changes
         run: |
           git config --global user.name 'GitHub Actions'
