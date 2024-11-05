@@ -56,6 +56,7 @@ static Logger ConfigureLogging(WebApplicationBuilder _builder)
    var logger = new LoggerConfiguration()
        .ReadFrom.Configuration(_builder.Configuration)
        .Enrich.With<LogLevelMapper>()
+       .Enrich.WithProperty("service.version", Environment.GetEnvironmentVariable("SERVICE_VERSION"))
        .CreateLogger();
    _builder.Logging.AddSerilog(logger);
    logger.Information("Starting application");
