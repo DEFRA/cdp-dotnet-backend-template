@@ -5,18 +5,23 @@ using System.Diagnostics.CodeAnalysis;
 namespace Backend.Api.Utils.Mongo;
 
 [ExcludeFromCodeCoverage]
-
 public class MongoDbClientFactory : IMongoDbClientFactory
 {
     private readonly IMongoDatabase _mongoDatabase;
-   private readonly MongoClient _client;
+    private readonly MongoClient _client;
 
-    public MongoDbClientFactory(string? connectionString, string databaseName)
+    public MongoDbClientFactory(IConfiguration configuration)
     {
-        if (string.IsNullOrWhiteSpace(connectionString))
-            throw new ArgumentException("MongoDB connection string cannot be empty");
+        var uri = configuration.GetValue<string>("Mongo:DatabaseUri");
+        var databaseName = configuration.GetValue<string>("Mongo:DatabaseName");
+        
+        if (string.IsNullOrWhiteSpace(uri))
+            throw new ArgumentException("MongoDB uri string cannot be empty");
 
-        var settings = MongoClientSettings.FromConnectionString(connectionString);
+        if (string.IsNullOrWhiteSpace(databaseName))
+            throw new ArgumentException("MongoDB database name cannot be empty");
+        
+        var settings = MongoClientSettings.FromConnectionString(uri);
         _client = new MongoClient(settings);
 
         var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
@@ -24,12 +29,6 @@ public class MongoDbClientFactory : IMongoDbClientFactory
         ConventionRegistry.Register("CamelCase", camelCaseConvention, _ => true);
 
         _mongoDatabase = _client.GetDatabase(databaseName);
-    }
-
-    public IMongoClient CreateClient()
-    {
-
-        return _client;
     }
 
     public IMongoCollection<T> GetCollection<T>(string collection)
@@ -41,5 +40,4 @@ public class MongoDbClientFactory : IMongoDbClientFactory
     {
         return _client;
     }
-
 }

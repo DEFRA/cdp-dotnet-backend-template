@@ -8,9 +8,9 @@ public class EnvironmentTest
    [Fact]
    public void IsNotDevModeByDefault()
    {
-      var _builder = WebApplication.CreateBuilder();
+      var builder = WebApplication.CreateBuilder();
 
-      var isDev = Backend.Api.Config.Environment.IsDevMode(_builder);
+      var isDev = Backend.Api.Config.Environment.IsDevMode(builder);
 
       Assert.False(isDev);
    }

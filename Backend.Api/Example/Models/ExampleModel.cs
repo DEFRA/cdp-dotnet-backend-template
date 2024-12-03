@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.IdGenerators;
@@ -17,5 +17,5 @@ public class ExampleModel
 
     public int? Counter { get; set; } = 0;
 
-   public DateTime? Created { get; set; } = DateTime.UtcNow;
+    public DateTime? Created { get; set; } = DateTime.UtcNow;
 }
