@@ -1,6 +1,7 @@
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System.Diagnostics.CodeAnalysis;
+using Backend.Api.Config;
 
 namespace Backend.Api.Utils.Mongo;
 
@@ -10,10 +11,10 @@ public class MongoDbClientFactory : IMongoDbClientFactory
     private readonly IMongoDatabase _mongoDatabase;
     private readonly MongoClient _client;
 
-    public MongoDbClientFactory(IConfiguration configuration)
-    {
-        var uri = configuration.GetValue<string>("Mongo:DatabaseUri");
-        var databaseName = configuration.GetValue<string>("Mongo:DatabaseName");
+    public MongoDbClientFactory(MongoConfig config)
+   {
+        var uri = config.DatabaseUri;
+        var databaseName = config.DatabaseName;
         
         if (string.IsNullOrWhiteSpace(uri))
             throw new ArgumentException("MongoDB uri string cannot be empty");

@@ -5,6 +5,7 @@ using Backend.Api.Utils.Http;
 using Backend.Api.Utils.Mongo;
 using FluentValidation;
 using System.Diagnostics.CodeAnalysis;
+using Backend.Api.Config;
 using Backend.Api.Utils.Logging;
 using Serilog;
 
@@ -57,6 +58,7 @@ static void ConfigureBuilder(WebApplicationBuilder builder)
     
     
     // Set up the MongoDB client. Config and credentials are injected automatically at runtime.
+    builder.Services.Configure<MongoConfig>(builder.Configuration.GetSection("Mongo"));
     builder.Services.AddSingleton<IMongoDbClientFactory, MongoDbClientFactory>();
     
     builder.Services.AddHealthChecks();
