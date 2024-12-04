@@ -4,7 +4,7 @@ using NSubstitute;
 using Microsoft.Extensions.Logging.Abstractions;
 using Backend.Api.Utils.Mongo;
 
-namespace Backend.Api.Tests.Utils.Mongo
+namespace Backend.Api.Test.Utils.Mongo
 {
    public class MongoServiceTests
    {

@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Example.Endpoints;
 
- [ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage]
 public static class ExampleEndpoints
 {
     public static void UseExampleEndpoints(this IEndpointRouteBuilder app)
