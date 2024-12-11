@@ -12,7 +12,7 @@ public class ExampleValidatorTests
     [Fact]
     public void ValidModel()
     {
-        var model = new ExampleModel()
+        var model = new ExampleModel
         {
             Id = new ObjectId(),
             Value = "some value",
@@ -26,7 +26,7 @@ public class ExampleValidatorTests
     [Fact]
     public void InvalidName()
     {
-        var model = new ExampleModel()
+        var model = new ExampleModel
         {
             Id = new ObjectId(),
             Value = "Some value",
@@ -39,7 +39,7 @@ public class ExampleValidatorTests
     [Fact]
     public void InvalidCounter()
     {
-        var model = new ExampleModel()
+        var model = new ExampleModel
         {
             Id = new ObjectId(),
             Value = "Some value",
@@ -54,7 +54,7 @@ public class ExampleValidatorTests
     [Fact]
     public void EmptyValue()
     {
-        var model = new ExampleModel()
+        var model = new ExampleModel
         {
             Id = new ObjectId(),
             Value = "",

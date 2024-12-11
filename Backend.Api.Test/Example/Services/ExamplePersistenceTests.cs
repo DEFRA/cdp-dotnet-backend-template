@@ -48,7 +48,7 @@ public class ExamplePersistenceTests
           .InsertOneAsync(Arg.Any<ExampleModel>())
           .Returns(Task.CompletedTask);
 
-      var example = new ExampleModel()
+      var example = new ExampleModel
       {
          Id = new ObjectId(),
          Value = "some value",

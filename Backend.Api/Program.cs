@@ -2,94 +2,81 @@ using Backend.Api.Example.Endpoints;
 using Backend.Api.Example.Services;
 using Backend.Api.Utils;
 using Backend.Api.Utils.Http;
-using Backend.Api.Utils.Logging;
 using Backend.Api.Utils.Mongo;
 using FluentValidation;
-using Serilog;
-using Serilog.Core;
 using System.Diagnostics.CodeAnalysis;
-
-//-------- Configure the WebApplication builder------------------//
+using Backend.Api.Config;
+using Backend.Api.Utils.Logging;
+using Serilog;
 
 var app = CreateWebApplication(args);
 await app.RunAsync();
-
+return;
 
 [ExcludeFromCodeCoverage]
 static WebApplication CreateWebApplication(string[] args)
 {
-   var _builder = WebApplication.CreateBuilder(args);
+    var builder = WebApplication.CreateBuilder(args);
+    ConfigureBuilder(builder);
 
-   ConfigureWebApplication(_builder);
-
-   var _app = BuildWebApplication(_builder);
-
-   return _app;
+    var app = builder.Build();
+    return SetupApplication(app);
 }
 
 [ExcludeFromCodeCoverage]
-static void ConfigureWebApplication(WebApplicationBuilder _builder)
+static void ConfigureBuilder(WebApplicationBuilder builder)
 {
-   _builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddEnvironmentVariables();
 
-   var logger = ConfigureLogging(_builder);
+    // Load certificates into Trust Store - Note must happen before Mongo and Http client connections.
+    builder.Services.AddCustomTrustStore();
+    
+    // Configure logging to use the CDP Platform standards.
+    builder.Services.AddHttpContextAccessor();
+    builder.Host.UseSerilog(CdpLogging.Configuration);
+    
+    // Default HTTP Client
+    builder.Services
+        .AddHttpClient("DefaultClient")
+        .AddHeaderPropagation();
 
-   // Load certificates into Trust Store - Note must happen before Mongo and Http client connections
-   _builder.Services.AddCustomTrustStore(logger);
+    // Proxy HTTP Client
+    builder.Services.AddTransient<ProxyHttpMessageHandler>();
+    builder.Services
+        .AddHttpClient("proxy")
+        .ConfigurePrimaryHttpMessageHandler<ProxyHttpMessageHandler>();
 
-   ConfigureMongoDb(_builder);
-
-   ConfigureEndpoints(_builder);
-
-   _builder.Services.AddHttpClient();
-
-   // calls outside the platform should be done using the named 'proxy' http client.
-   _builder.Services.AddHttpProxyClient(logger);
-
-   _builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+    // Propagate trace header.
+    builder.Services.AddHeaderPropagation(options =>
+    {
+        var traceHeader = builder.Configuration.GetValue<string>("TraceHeader");
+        if (!string.IsNullOrWhiteSpace(traceHeader))
+        {
+            options.Headers.Add(traceHeader);
+        }
+    });
+    
+    
+    // Set up the MongoDB client. Config and credentials are injected automatically at runtime.
+    builder.Services.Configure<MongoConfig>(builder.Configuration.GetSection("Mongo"));
+    builder.Services.AddSingleton<IMongoDbClientFactory, MongoDbClientFactory>();
+    
+    builder.Services.AddHealthChecks();
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+    
+    // Set up the endpoints and their dependencies
+    builder.Services.AddSingleton<IExamplePersistence, ExamplePersistence>();
 }
 
 [ExcludeFromCodeCoverage]
-static Logger ConfigureLogging(WebApplicationBuilder _builder)
+static WebApplication SetupApplication(WebApplication app)
 {
-   _builder.Logging.ClearProviders();
-   var logger = new LoggerConfiguration()
-       .ReadFrom.Configuration(_builder.Configuration)
-       .Enrich.With<LogLevelMapper>()
-       .Enrich.WithProperty("service.version", Environment.GetEnvironmentVariable("SERVICE_VERSION"))
-       .CreateLogger();
-   _builder.Logging.AddSerilog(logger);
-   logger.Information("Starting application");
-   return logger;
-}
+    app.UseHeaderPropagation();
+    app.UseRouting();
+    app.MapHealthChecks("/health");
 
-[ExcludeFromCodeCoverage]
-static void ConfigureMongoDb(WebApplicationBuilder _builder)
-{
-   _builder.Services.AddSingleton<IMongoDbClientFactory>(_ =>
-       new MongoDbClientFactory(_builder.Configuration.GetValue<string>("Mongo:DatabaseUri")!,
-           _builder.Configuration.GetValue<string>("Mongo:DatabaseName")!));
-}
+    // Example module, remove before deploying!
+    app.UseExampleEndpoints();
 
-[ExcludeFromCodeCoverage]
-static void ConfigureEndpoints(WebApplicationBuilder _builder)
-{
-   // our Example service, remove before deploying!
-   _builder.Services.AddSingleton<IExamplePersistence, ExamplePersistence>();
-
-   _builder.Services.AddHealthChecks();
-}
-
-[ExcludeFromCodeCoverage]
-static WebApplication BuildWebApplication(WebApplicationBuilder _builder)
-{
-   var app = _builder.Build();
-
-   app.UseRouting();
-   app.MapHealthChecks("/health");
-
-   // Example module, remove before deploying!
-   app.UseExampleEndpoints();
-
-   return app;
+    return app;
 }
