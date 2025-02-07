@@ -69,7 +69,7 @@ services:
   your-backend:
     build: ./
     ports:
-      - '5094:5094'
+      - '8080:8080'
     links:
       - 'localstack:localstack'
       - 'mongodb:mongodb'
@@ -81,7 +81,7 @@ services:
     env_file:
       - 'compose/aws.env'
     environment:
-      PORT: 3555
+      PORT: 8080
       LOCALSTACK_ENDPOINT: http://localstack:4566
       MONGO_URI: mongodb://mongodb:27017/
     networks:
