@@ -26,11 +26,10 @@ public static class TrustStore
             }).ToList();
     }
 
-    private static void AddCertificates(IReadOnlyCollection<string> certificates)
+    private static void AddCertificates(List<string> certificates)
     {
         if (certificates.Count == 0) return; // to stop trust store access denied issues on Macs
-        var x509Certificate2S = certificates.Select(
-            cert => new X509Certificate2(Encoding.ASCII.GetBytes(cert)));
+        var x509Certificate2S = certificates.Select(cert => new X509Certificate2(Encoding.ASCII.GetBytes(cert)));
         var certificateCollection = new X509Certificate2Collection();
 
         foreach (var certificate2 in x509Certificate2S)

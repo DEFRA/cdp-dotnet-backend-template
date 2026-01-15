@@ -25,6 +25,7 @@ public interface IExamplePersistence
  * The base class `MongoService` provides access to the db collection as well as providing helpers to
  * ensure the indexes for this collection are created on startup.
  */
+[ExcludeFromCodeCoverage]
 public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILoggerFactory loggerFactory)
     : MongoService<ExampleModel>(connectionFactory, "example", loggerFactory), IExamplePersistence
 {

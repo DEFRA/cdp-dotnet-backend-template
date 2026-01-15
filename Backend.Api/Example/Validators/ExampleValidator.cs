@@ -1,8 +1,10 @@
-﻿using Backend.Api.Example.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using Backend.Api.Example.Models;
 using FluentValidation;
 
 namespace Backend.Api.Example.Validators;
 
+[ExcludeFromCodeCoverage]
 public class ExampleValidator : AbstractValidator<ExampleModel>
 {
     /**
