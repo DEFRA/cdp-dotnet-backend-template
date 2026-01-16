@@ -6,35 +6,22 @@ namespace Backend.Api.Utils.Http;
 public class ProxyHttpMessageHandler : HttpClientHandler
 {
     [ExcludeFromCodeCoverage]
-    public ProxyHttpMessageHandler()
+    public ProxyHttpMessageHandler(ILogger<ProxyHttpMessageHandler> logger)
     {
-        var proxyUri = Environment.GetEnvironmentVariable("CDP_HTTPS_PROXY");
+        var proxyUri = Environment.GetEnvironmentVariable("HTTP_PROXY");
         var proxy = new WebProxy { BypassProxyOnLocal = true };
         if (proxyUri != null)
         {
-            var uri = new UriBuilder(proxyUri);
-
-            var credentials = GetCredentialsFromUri(uri);
-            if (credentials != null)
-            {
-                proxy.Credentials = credentials;
-            }
-
-            // Remove credentials from URI to so they don't get logged.
-            uri.UserName = "";
-            uri.Password = "";
-            proxy.Address = uri.Uri;
+            logger.LogDebug("Creating proxy http client");
+            var uri = new UriBuilder(proxyUri).Uri;
+            proxy.Address = uri;
+        }
+        else
+        {
+            logger.LogWarning("HTTP_PROXY is NOT set, proxy client will be disabled");
         }
 
         Proxy = proxy;
         UseProxy = proxyUri != null;
-    }
-
-    public static NetworkCredential? GetCredentialsFromUri(UriBuilder uri)
-    {
-        var username = uri.UserName;
-        var password = uri.Password;
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password)) return null;
-        return new NetworkCredential(username, password);
     }
 }
