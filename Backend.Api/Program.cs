@@ -3,7 +3,6 @@ using Backend.Api.Example.Services;
 using Backend.Api.Utils;
 using Backend.Api.Utils.Http;
 using Backend.Api.Utils.Mongo;
-using FluentValidation;
 using System.Diagnostics.CodeAnalysis;
 using Backend.Api.Config;
 using Backend.Api.Utils.Logging;
@@ -66,7 +65,6 @@ static void ConfigureBuilder(WebApplicationBuilder builder)
 
     // Add healthcheck, this is required for the platform to know your service is alive.
     builder.Services.AddHealthChecks();
-    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
     // Set up the endpoints and their dependencies
     builder.Services.AddSingleton<IExamplePersistence, ExamplePersistence>();

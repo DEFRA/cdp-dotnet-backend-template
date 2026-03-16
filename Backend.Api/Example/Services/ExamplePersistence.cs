@@ -7,17 +7,17 @@ namespace Backend.Api.Example.Services;
 
 public interface IExamplePersistence
 {
-    public Task<bool> CreateAsync(ExampleModel example);
+    Task<bool> CreateAsync(ExampleModel example);
 
-    public Task<ExampleModel?> GetByExampleName(string name);
+    Task<ExampleModel?> GetByExampleName(string name);
 
-    public Task<IEnumerable<ExampleModel>> GetAllAsync();
+    Task<IEnumerable<ExampleModel>> GetAllAsync();
 
-    public Task<IEnumerable<ExampleModel>> SearchByValueAsync(string searchTerm);
+    Task<IEnumerable<ExampleModel>> SearchByValueAsync(string searchTerm);
 
-    public Task<bool> UpdateAsync(ExampleModel example);
+    Task<bool> UpdateAsync(ExampleModel example);
 
-    public Task<bool> DeleteAsync(string name);
+    Task<bool> DeleteAsync(string name);
 }
 
 /**
@@ -67,11 +67,7 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
         return result;
     }
 
-    /**
-     * Updates the value field for a given name and increments the counter.
-     * Rather than replacing the whole record we selectively $set and $inc fields while leaving others
-     * unchanged.
-     */
+ 
     [ExcludeFromCodeCoverage]
     public async Task<bool> UpdateAsync(ExampleModel example)
     {
@@ -91,11 +87,6 @@ public class ExamplePersistence(IMongoDbClientFactory connectionFactory, ILogger
         return result.DeletedCount > 0;
     }
 
-    /**
-     * Ensure indexes are created for this collection.
-     * In this example it creates a single index on the `name` field. The Unique flag is set preventing duplicate names
-     * being inserted.
-     */
     [ExcludeFromCodeCoverage]
     protected override List<CreateIndexModel<ExampleModel>> DefineIndexes(
         IndexKeysDefinitionBuilder<ExampleModel> builder)

@@ -84,6 +84,7 @@ services:
       PORT: 8080
       LOCALSTACK_ENDPOINT: http://localstack:4566
       MONGO_URI: mongodb://mongodb:27017/
+      MONGO_URI: mongodb://mongodb:27017/
     networks:
       - cdp-tenant
 
