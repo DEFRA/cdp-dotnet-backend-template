@@ -1,4 +1,3 @@
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using System.Diagnostics.CodeAnalysis;
 using Backend.Api.Config;
@@ -17,7 +16,7 @@ public interface IMongoDbClientFactory
 public class MongoDbClientFactory : IMongoDbClientFactory
 {
     private readonly IMongoDatabase _mongoDatabase;
-    private readonly MongoClient _client;
+    private readonly IMongoClient _client;
 
     public MongoDbClientFactory(IOptions<MongoConfig> config)
     {
@@ -32,11 +31,6 @@ public class MongoDbClientFactory : IMongoDbClientFactory
 
         var settings = MongoClientSettings.FromConnectionString(uri);
         _client = new MongoClient(settings);
-
-        var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
-        // convention must be registered before initializing collection
-        ConventionRegistry.Register("CamelCase", camelCaseConvention, _ => true);
-
         _mongoDatabase = _client.GetDatabase(databaseName);
     }
 

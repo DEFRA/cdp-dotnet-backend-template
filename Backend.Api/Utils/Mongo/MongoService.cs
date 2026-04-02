@@ -1,4 +1,4 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils.Mongo;

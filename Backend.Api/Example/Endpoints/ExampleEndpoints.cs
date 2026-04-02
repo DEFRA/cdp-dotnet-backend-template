@@ -1,4 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
 using Backend.Api.Example.Models;
 using Backend.Api.Example.Services;
 using System.Diagnostics.CodeAnalysis;
@@ -10,83 +9,96 @@ namespace Backend.Api.Example.Endpoints;
 [ExcludeFromCodeCoverage]
 public static class ExampleEndpoints
 {
-    public static void UseExampleEndpoints(this IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapExampleEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("example", Create);
-        app.MapGet("example", GetAll);
-        app.MapGet("example/{name}", GetByName).WithName("GetByName");
-        app.MapPut("example/{name}", Update);
-        app.MapDelete("example/{name}", Delete);
+        var group = app.MapGroup("/example")
+            .WithTags("Example");
+
+        group.MapPost(string.Empty, Create);
+        group.MapGet(string.Empty, GetAll);
+        group.MapGet("/{name}", GetByName).WithName("GetByName");
+        group.MapPut("/{name}", Update);
+        group.MapDelete("/{name}", Delete);
+
+        return group;
     }
 
-    private static async Task<Results<BadRequest<List<ValidationResult>>, Conflict<string>, CreatedAtRoute>> Create(
-        [FromBody] ExampleModel example, 
-        [FromServices] IExamplePersistence examplePersistence
-        )
+    private static async Task<Results<CreatedAtRoute<ExampleModel>, Conflict<ProblemDetails>>> Create(
+        CreateExampleRequest request,
+        [FromServices] IExamplePersistence examplePersistence,
+        CancellationToken cancellationToken)
     {
-        var results = new List<ValidationResult>();
-        var isValid = Validator.TryValidateObject(example, new ValidationContext(example), results, validateAllProperties: true);
-        if (!isValid)
+        var example = new ExampleModel
         {
-            return TypedResults.BadRequest(results);
+            Name = request.Name,
+            Value = request.Value,
+            Counter = request.Counter
+        };
+
+        try
+        {
+            await examplePersistence.CreateAsync(example, cancellationToken);
+        }
+        catch (ExampleConflictException ex)
+        {
+            return TypedResults.Conflict(new ProblemDetails
+            {
+                Title = "Example already exists",
+                Detail = ex.Message,
+                Status = StatusCodes.Status409Conflict
+            });
         }
 
-        var created = await examplePersistence.CreateAsync(example);
-        if (!created)
-        {
-            return TypedResults.Conflict("An example record with this name already exists");
-        }
-
-        return TypedResults.CreatedAtRoute(
-            routeName: "GetByName",
-            routeValues: new { entityId = example.Name });
+        return TypedResults.CreatedAtRoute(example, "GetByName", new { name = example.Name });
     }
 
-    private static async Task<Ok<IEnumerable<ExampleModel>>> GetAll(
-        [FromQuery]  string? searchTerm,
-        [FromServices] IExamplePersistence examplePersistence)
+    private static async Task<Ok<IReadOnlyCollection<ExampleModel>>> GetAll(
+        [FromQuery] string? searchTerm,
+        [FromServices] IExamplePersistence examplePersistence,
+        CancellationToken cancellationToken)
     {
         if (searchTerm is not null && !string.IsNullOrWhiteSpace(searchTerm))
         {
-            var matched = await examplePersistence.SearchByValueAsync(searchTerm);
+            var matched = await examplePersistence.SearchAsync(searchTerm, cancellationToken);
             return TypedResults.Ok(matched);
         }
 
-        var matches = await examplePersistence.GetAllAsync();
+        var matches = await examplePersistence.GetAllAsync(cancellationToken);
         return TypedResults.Ok(matches);
     }
 
     private static async Task<Results<Ok<ExampleModel>, NotFound>> GetByName(
-        [FromRoute] string name, 
-        [FromServices] IExamplePersistence examplePersistence)
+        [FromRoute] string name,
+        [FromServices] IExamplePersistence examplePersistence,
+        CancellationToken cancellationToken)
     {
-        var example = await examplePersistence.GetByExampleName(name);
+        var example = await examplePersistence.GetByNameAsync(name, cancellationToken);
         return example is not null ? TypedResults.Ok(example) : TypedResults.NotFound();
     }
 
-    private static async Task<Results<Ok<ExampleModel>, BadRequest<List<ValidationResult>>, NotFound>> Update(
-        [FromRoute] string name, 
-        [FromBody] ExampleModel example,
-        [FromServices] IExamplePersistence examplePersistence)
+    private static async Task<Results<Ok<ExampleModel>, NotFound>> Update(
+        [FromRoute] string name,
+        UpdateExampleRequest request,
+        [FromServices] IExamplePersistence examplePersistence,
+        CancellationToken cancellationToken)
     {
-        example.Name = name;
-        
-        var results = new List<ValidationResult>();
-        var isValid = Validator.TryValidateObject(example, new ValidationContext(example), results, validateAllProperties: true);
-        if (!isValid)
+        var example = new ExampleModel
         {
-            return TypedResults.BadRequest(results);
-        }
+            Name = name,
+            Value = request.Value,
+            Counter = request.Counter
+        };
 
-        var updated = await examplePersistence.UpdateAsync(example);
-        return updated ? TypedResults.Ok(example) : TypedResults.NotFound();
+        var updated = await examplePersistence.UpdateAsync(example, cancellationToken);
+        return updated is not null ? TypedResults.Ok(updated) : TypedResults.NotFound();
     }
 
-    private static async Task<IResult> Delete(
-        [FromRoute] string name, 
-        [FromServices] IExamplePersistence examplePersistence)
+    private static async Task<Results<NoContent, NotFound>> Delete(
+        [FromRoute] string name,
+        [FromServices] IExamplePersistence examplePersistence,
+        CancellationToken cancellationToken)
     {
-        var deleted = await examplePersistence.DeleteAsync(name);
-        return deleted ? Results.Ok() : Results.NotFound();
+        var deleted = await examplePersistence.DeleteAsync(name, cancellationToken);
+        return deleted ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 }
