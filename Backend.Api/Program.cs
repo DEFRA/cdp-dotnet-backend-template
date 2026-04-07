@@ -87,7 +87,7 @@ static void ConfigureHttpClients(IServiceCollection services)
 static void ConfigureMongo(IServiceCollection services, IConfiguration configuration)
 {
 
-    //MongoClientSettings.Extensions.AddAWSAuthentication();
+    MongoClientSettings.Extensions.AddAWSAuthentication();
     MongoConventions.Register();
 
     services
@@ -102,8 +102,6 @@ static void ConfigureMongo(IServiceCollection services, IConfiguration configura
 [ExcludeFromCodeCoverage]
 static void ConfigureMiddleware(WebApplication app)
 {
-    app.UseExceptionHandler();
-
     app.UseSerilogRequestLogging();
 
     app.UseHeaderPropagation();
