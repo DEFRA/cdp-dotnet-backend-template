@@ -7,6 +7,8 @@ using Backend.Api.Utils.Mongo;
 using System.Diagnostics.CodeAnalysis;
 using Backend.Api.Utils.Logging;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using MongoDB.Driver;
+using MongoDB.Driver.Authentication.AWS;
 using Serilog;
 
 var app = BuildApp(args);
@@ -84,7 +86,8 @@ static void ConfigureHttpClients(IServiceCollection services)
 [ExcludeFromCodeCoverage]
 static void ConfigureMongo(IServiceCollection services, IConfiguration configuration)
 {
-    MongoAwsAuthentication.Configure();
+
+    //MongoClientSettings.Extensions.AddAWSAuthentication();
     MongoConventions.Register();
 
     services
