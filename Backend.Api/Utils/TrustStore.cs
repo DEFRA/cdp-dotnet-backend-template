@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Api.Utils;
@@ -8,28 +7,24 @@ namespace Backend.Api.Utils;
 [ExcludeFromCodeCoverage]
 public static class TrustStore
 {
-    public static void AddCustomTrustStore(this IServiceCollection _)
+    public static void LoadCustomTrustStoreFromEnvironment(this IServiceCollection _)
     {
         var certificates = GetCertificates();
         AddCertificates(certificates);
     }
 
-    private static List<string> GetCertificates()
+    private static List<byte[]> GetCertificates()
     {
         return Environment.GetEnvironmentVariables().Cast<DictionaryEntry>()
             .Where(entry =>
-                entry.Key.ToString()!.StartsWith("TRUSTSTORE") && IsBase64String(entry.Value!.ToString() ?? ""))
-            .Select(entry =>
-            {
-                var data = Convert.FromBase64String(entry.Value!.ToString() ?? "");
-                return Encoding.UTF8.GetString(data);
-            }).ToList();
+                entry.Key.ToString()!.StartsWith("TRUSTSTORE_", StringComparison.Ordinal) && IsBase64String(entry.Value?.ToString() ?? ""))
+            .Select(entry => Convert.FromBase64String(entry.Value?.ToString() ?? "")).ToList();
     }
 
-    private static void AddCertificates(List<string> certificates)
+    private static void AddCertificates(List<byte[]> certificates)
     {
         if (certificates.Count == 0) return; // to stop trust store access denied issues on Macs
-        var x509Certificate2S = certificates.Select(cert => new X509Certificate2(Encoding.ASCII.GetBytes(cert)));
+        var x509Certificate2S = certificates.Select(X509CertificateLoader.LoadCertificate);
         var certificateCollection = new X509Certificate2Collection();
 
         foreach (var certificate2 in x509Certificate2S)
@@ -45,7 +40,7 @@ public static class TrustStore
         }
         catch (Exception ex)
         {
-            throw new FileLoadException("Root certificate import failed: " + ex.Message, ex);
+            throw new InvalidOperationException("Root certificate import failed: " + ex.Message, ex);
         }
         finally
         {

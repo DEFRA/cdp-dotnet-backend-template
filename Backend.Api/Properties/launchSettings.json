@@ -2,11 +2,13 @@
   "profiles": {
     "Backend.Api": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
+      "dotnetRunMessages": false,
       "launchBrowser": false,
-      "applicationUrl": "http://localhost:5000",
+      "applicationUrl": "http://localhost:8085",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Mongo__DatabaseUri": "mongodb://127.0.0.1:27017/",
+        "Mongo__DatabaseName": "cdp-dotnet-backend-template"
       }
     }
   }

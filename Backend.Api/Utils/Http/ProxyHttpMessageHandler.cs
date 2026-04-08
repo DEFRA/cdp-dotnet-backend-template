@@ -3,6 +3,7 @@ using System.Net;
 
 namespace Backend.Api.Utils.Http;
 
+[ExcludeFromCodeCoverage]
 public class ProxyHttpMessageHandler : HttpClientHandler
 {
     [ExcludeFromCodeCoverage]

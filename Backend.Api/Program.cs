@@ -1,86 +1,117 @@
 using Backend.Api.Example.Endpoints;
 using Backend.Api.Example.Services;
+using Backend.Api.Config;
 using Backend.Api.Utils;
 using Backend.Api.Utils.Http;
 using Backend.Api.Utils.Mongo;
-using FluentValidation;
 using System.Diagnostics.CodeAnalysis;
-using Backend.Api.Config;
 using Backend.Api.Utils.Logging;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using MongoDB.Driver;
 using MongoDB.Driver.Authentication.AWS;
 using Serilog;
 
-var app = CreateWebApplication(args);
+var app = BuildApp(args);
 await app.RunAsync();
-return;
 
 [ExcludeFromCodeCoverage]
-static WebApplication CreateWebApplication(string[] args)
+static WebApplication BuildApp(string[] args)
 {
     var builder = WebApplication.CreateBuilder(args);
-    ConfigureBuilder(builder);
+
+    ConfigureHost(builder);
+    ConfigureServices(builder);
 
     var app = builder.Build();
-    return SetupApplication(app);
+
+    ConfigureMiddleware(app);
+    ConfigureEndpoints(app);
+
+    return app;
 }
 
 [ExcludeFromCodeCoverage]
-static void ConfigureBuilder(WebApplicationBuilder builder)
+static void ConfigureHost(WebApplicationBuilder builder)
 {
-    builder.Configuration.AddEnvironmentVariables();
-
-    // Load certificates into Trust Store - Note must happen before Mongo and Http client connections.
-    builder.Services.AddCustomTrustStore();
-
-    // Configure logging to use the CDP Platform standards.
-    builder.Services.AddHttpContextAccessor();
     builder.Host.UseSerilog(CdpLogging.Configuration);
+}
 
-    // Default HTTP Client
-    builder.Services
-        .AddHttpClient("DefaultClient")
-        .AddHeaderPropagation();
+[ExcludeFromCodeCoverage]
+static void ConfigureServices(WebApplicationBuilder builder)
+{
+    var services = builder.Services;
+    var configuration = builder.Configuration;
 
-    // Proxy HTTP Client
-    builder.Services.AddTransient<ProxyHttpMessageHandler>();
-    builder.Services
-        .AddHttpClient("proxy")
-        .ConfigurePrimaryHttpMessageHandler<ProxyHttpMessageHandler>();
+    // Trust material must be loaded before anything creates outbound connections.
+    services.LoadCustomTrustStoreFromEnvironment();
 
-    // Propagate trace header.
-    builder.Services.AddHeaderPropagation(options =>
+    services.AddProblemDetails();
+    services.AddValidation();
+
+    services.AddHttpContextAccessor();
+
+    ConfigureHeaderPropagation(services, configuration);
+    ConfigureHttpClients(services);
+    ConfigureMongo(services, configuration);
+
+    services.AddHealthChecks();
+
+    // App services
+    services.AddSingleton<IExamplePersistence, ExamplePersistence>();
+}
+
+[ExcludeFromCodeCoverage]
+static void ConfigureHeaderPropagation(IServiceCollection services, IConfiguration configuration)
+{
+    var traceHeader = configuration.GetValue<string>("TraceHeader");
+
+    services.AddHeaderPropagation(options =>
     {
-        var traceHeader = builder.Configuration.GetValue<string>("TraceHeader");
         if (!string.IsNullOrWhiteSpace(traceHeader))
         {
             options.Headers.Add(traceHeader);
         }
     });
-
-
-    // Set up the MongoDB client. Config and credentials are injected automatically at runtime.
-    MongoClientSettings.Extensions.AddAWSAuthentication();
-    builder.Services.Configure<MongoConfig>(builder.Configuration.GetSection("Mongo"));
-    builder.Services.AddSingleton<IMongoDbClientFactory, MongoDbClientFactory>();
-
-    // Add healthcheck, this is required for the platform to know your service is alive.
-    builder.Services.AddHealthChecks();
-    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
-    // Set up the endpoints and their dependencies
-    builder.Services.AddSingleton<IExamplePersistence, ExamplePersistence>();
 }
 
 [ExcludeFromCodeCoverage]
-static WebApplication SetupApplication(WebApplication app)
+static void ConfigureHttpClients(IServiceCollection services)
 {
+    services.AddTransient<ProxyHttpMessageHandler>();
+
+    // services.AddHttpClientWithTracing<IExampleClient, ExampleClient>();
+    // services.AddHttpClientWithProxy<IExternalClient, ExternalClient>();
+}
+
+[ExcludeFromCodeCoverage]
+static void ConfigureMongo(IServiceCollection services, IConfiguration configuration)
+{
+
+    MongoExtensions.Register();
+    MongoConventions.Register();
+
+    services
+        .AddOptions<MongoConfig>()
+        .Bind(configuration.GetRequiredSection("Mongo"))
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
+
+    services.AddSingleton<IMongoDbClientFactory, MongoDbClientFactory>();
+}
+
+[ExcludeFromCodeCoverage]
+static void ConfigureMiddleware(WebApplication app)
+{
+    app.UseSerilogRequestLogging();
+
     app.UseHeaderPropagation();
-    app.UseRouting();
-    app.MapHealthChecks("/health");
+}
 
-    // Example module, remove before deploying!
-    app.UseExampleEndpoints();
+[ExcludeFromCodeCoverage]
+static void ConfigureEndpoints(WebApplication app)
+{
+    app.MapHealthChecks("/health", new HealthCheckOptions());
 
-    return app;
+    // Remove before deploying
+    app.MapExampleEndpoints();
 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -13,11 +13,11 @@ public class ExampleModel
     [property: JsonIgnore(Condition = JsonIgnoreCondition.Always)]
     public ObjectId? Id { get; init; }
 
-    public required string Name { get; set; }
+    public required string Name { get; init; }
 
     public required string Value { get; set; }
 
-    public int? Counter { get; set; } = 0;
+    public int Counter { get; set; }
 
-    public DateTime? Created { get; set; } = DateTime.UtcNow;
+    public DateTime Created { get; init; } = DateTime.UtcNow;
 }
