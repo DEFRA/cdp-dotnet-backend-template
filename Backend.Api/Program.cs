@@ -87,7 +87,7 @@ static void ConfigureHttpClients(IServiceCollection services)
 static void ConfigureMongo(IServiceCollection services, IConfiguration configuration)
 {
 
-    MongoClientSettings.Extensions.AddAWSAuthentication();
+    MongoExtensions.Register();
     MongoConventions.Register();
 
     services
