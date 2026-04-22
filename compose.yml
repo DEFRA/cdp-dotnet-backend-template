@@ -1,25 +1,17 @@
 version: '3.4'
 services:
-  localstack:
-    image: localstack/localstack:3.0.2
+  # floci is a replacement for localstack. It emulates AWS resources (sqs, sns, s3 etc) for local development
+  # See: https://floci.io for more details
+  floci:
+    image: hectorvent/floci:latest-aws
     ports:
-      - '4566:4566' # LocalStack Gateway
-      - '4510-4559:4510-4559' # external services port range
+      - '4566:4566'
     env_file:
       - 'compose/aws.env'
     environment:
-      DEBUG: ${DEBUG:-1}
-      LS_LOG: WARN # Localstack DEBUG Level
-      SERVICES: s3,sqs,sns,firehose
-      LOCALSTACK_HOST: 127.0.0.1
+      FLOCI_DEFAULT_REGION: eu-west-2
     volumes:
-      - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
-      - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
-    healthcheck:
-      test: ['CMD', 'curl', 'localhost:4566']
-      interval: 5s
-      start_period: 5s
-      retries: 3
+      - ./compose/floci/start.d:/etc/floci/init/start.d:ro
     networks:
       - cdp-tenant
 
@@ -27,7 +19,6 @@ services:
     image: redis:7.2.3-alpine3.18
     ports:
       - '6379:6379'
-    restart: always
     networks:
       - cdp-tenant
 
@@ -39,7 +30,6 @@ services:
       - '27017:27017'
     volumes:
       - mongodb-data:/data
-    restart: always
 
   ################################################################################
 
@@ -48,10 +38,10 @@ services:
   #   ports:
   #     - '3000:3000'
   #   links:
-  #     - 'localstack:localstack'
+  #     - 'floci:floci'
   #     - 'redis:redis'
   #   depends_on:
-  #     localstack:
+  #     floci:
   #       condition: service_healthy
   #     redis:
   #       condition: service_started
@@ -61,7 +51,6 @@ services:
   #     PORT: 3000
   #     NODE_ENV: development
   #     REDIS_HOST: redis
-  #     LOCALSTACK_ENDPOINT: http://localstack:4566
   #     USE_SINGLE_INSTANCE_CACHE: true
   #   networks:
   #     - cdp-tenant
@@ -71,18 +60,17 @@ services:
     ports:
       - '8085:8085'
     links:
-      - 'localstack:localstack'
+      - 'floci:floci'
       - 'mongodb:mongodb'
     depends_on:
-      localstack:
+      floci:
         condition: service_healthy
       mongodb:
         condition: service_started
     env_file:
       - 'compose/aws.env'
     environment:
-      PORT: 8085
-      LOCALSTACK_ENDPOINT: http://localstack:4566
+      ASPNETCORE_URLS: http://+:8085
       Mongo__DatabaseUri: mongodb://mongodb:27017/
     networks:
       - cdp-tenant
