@@ -1,4 +1,3 @@
-version: '3.4'
 services:
   # floci is a replacement for localstack. It emulates AWS resources (sqs, sns, s3 etc) for local development
   # See: https://floci.io for more details
