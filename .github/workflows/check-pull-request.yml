@@ -32,4 +32,5 @@ jobs:
 #     name: CDP SonarCloud Scan
 #     uses: ./.github/workflows/sonarcloud.yml
 #     needs: pr-validator
-#     secrets: inherit
+#     secrets:
+#       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
