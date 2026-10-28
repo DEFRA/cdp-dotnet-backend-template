@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
-            10.0
+            10.x
       - run: dotnet test
     ## SonarCloud
     ## Uncomment to unable SonarCloud scan
