@@ -1,21 +1,35 @@
-﻿# Build stage image
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /src
-COPY . .
-WORKDIR "/src"
+ARG PARENT_VERSION=2.1.9-dotnet10.0
+ARG PORT=8085
+
+# Build stage image
+FROM defradigital/dotnetcore-development:${PARENT_VERSION} AS build
+ARG PARENT_VERSION
+LABEL uk.gov.defra.parent-image=defradigital/dotnetcore-development:${PARENT_VERSION}
+
+COPY --chown=dotnet:dotnet . .
 RUN dotnet test Backend.Api.Test
-RUN dotnet publish Backend.Api -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish Backend.Api -c Release -o /home/dotnet/publish /p:UseAppHost=false
 
 # Final production image
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 
+FROM defradigital/dotnetcore:${PARENT_VERSION} AS production
+ARG PARENT_VERSION
+LABEL uk.gov.defra.parent-image=defradigital/dotnetcore:${PARENT_VERSION}
+
+# Add curl to template.
+# CDP PLATFORM HEALTHCHECK REQUIREMENT
+USER root
+RUN apk add --no-cache curl icu-libs icu-data-full
+
+# The Alpine base defaults to invariant globalization; keep real cultures (en-GB, cy-GB) as on the old Debian image.
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+# App files stay root-owned so the dotnet user can't modify them. Not under /home/dotnet,
+#   which must stay writable: TrustStore.cs imports TRUSTSTORE_* certs into ~/.dotnet.
 WORKDIR /app
+COPY --from=build /home/dotnet/publish .
+USER dotnet
 
-# Add curl to template, CDP PLATFORM HEALTHCHECK REQUIREMENT
-RUN apt update && \
-    apt install curl -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY --from=build /app/publish .
-EXPOSE 8085
+ARG PORT
+ENV ASPNETCORE_HTTP_PORTS=${PORT}
+EXPOSE ${PORT}
 ENTRYPOINT ["dotnet", "Backend.Api.dll"]
