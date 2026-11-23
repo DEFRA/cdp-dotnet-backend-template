@@ -18,7 +18,10 @@ LABEL uk.gov.defra.parent-image=defradigital/dotnetcore:${PARENT_VERSION}
 # Add curl to template.
 # CDP PLATFORM HEALTHCHECK REQUIREMENT
 USER root
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl icu-libs icu-data-full
+
+# The Alpine base defaults to invariant globalization; keep real cultures (en-GB, cy-GB) as on the old Debian image.
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 
 # App files stay root-owned so the dotnet user can't modify them. Not under /home/dotnet,
 #   which must stay writable: TrustStore.cs imports TRUSTSTORE_* certs into ~/.dotnet.
@@ -27,5 +30,6 @@ COPY --from=build /home/dotnet/publish .
 USER dotnet
 
 ARG PORT
+ENV ASPNETCORE_HTTP_PORTS=${PORT}
 EXPOSE ${PORT}
 ENTRYPOINT ["dotnet", "Backend.Api.dll"]
